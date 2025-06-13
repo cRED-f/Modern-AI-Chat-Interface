@@ -30,6 +30,18 @@ export default defineSchema({
   prompts: defineTable({
     name: v.string(),
     content: v.string(),
+    targetModel: v.optional(v.union(v.literal("main"), v.literal("assistant"))),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
+  assistants: defineTable({
+    name: v.string(),
+    modelName: v.optional(v.string()),
+    temperature: v.optional(v.number()),
+    maxContextLength: v.optional(v.number()),
+    activeAfterQuestions: v.optional(v.number()),
+    systemPrompt: v.optional(v.string()),
+    isDefault: v.optional(v.boolean()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }),

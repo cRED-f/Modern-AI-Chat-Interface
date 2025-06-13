@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ApiSettings } from "../settings/api-settings";
 import { ModelPresets } from "../settings/model-presets";
 import { PromptsManager } from "../prompts/prompts-manager";
+import { AssistantsManager } from "../assistants/assistants-manager";
 import { motion } from "framer-motion";
 
 interface SidebarContentProps {
@@ -155,6 +156,50 @@ export const SidebarContent: FC<SidebarContentProps> = ({
             transition={{ delay: 0.3 }}
           >
             <PromptsManager />
+          </motion.div>
+        </motion.div>
+      );
+    }
+
+    // Special handling for assistants
+    if (contentType === "assistants") {
+      return (
+        <motion.div
+          className="flex h-full flex-col bg-white/90 backdrop-blur-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          {/* Header with Hide Button */}
+          <motion.div
+            className="flex items-center justify-between border-b border-white/20 p-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-sm font-medium text-gray-900">Assistants</h2>
+            {onToggleSidebar && (
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 rounded-md text-gray-500 hover:bg-white/50 hover:text-gray-700 transition-colors duration-200"
+                  onClick={onToggleSidebar}
+                >
+                  <IconChevronLeft size={16} />
+                </Button>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Assistants Content */}
+          <motion.div
+            className="flex-1 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <AssistantsManager />
           </motion.div>
         </motion.div>
       );

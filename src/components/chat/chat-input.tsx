@@ -20,22 +20,33 @@ export const ChatInput: FC<ChatInputProps> = ({
   onStopGeneration,
 }) => {
   const [userInput, setUserInput] = useState("");
+  const [selectedPrompt, setSelectedPrompt] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedPromptContent, setSelectedPromptContent] = useState("");
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInputChange = useCallback((value: string) => {
     setUserInput(value);
   }, []);
-  const handleSendMessage = useCallback(() => {
+
+  const handlePromptSelect = useCallback((promptContent: string) => {
+    setSelectedPrompt(promptContent);
+  }, []);  const handleSendMessage = useCallback(() => {
     if (!userInput.trim() || isGenerating) return;
 
-    // Send user message and prompt separately
-    onSendMessage(userInput, selectedPromptContent || undefined);
+    // Send user input to display in chat, and selected prompt as system message (if any)
+    onSendMessage(userInput.trim(), selectedPrompt || undefined);
     setUserInput("");
-    setSelectedPromptContent(""); // Clear prompt after sending
-  }, [userInput, selectedPromptContent, isGenerating, onSendMessage]);
+    
+    // Clear the selected prompt after first use so it's not sent again
+    if (selectedPrompt) {
+      setSelectedPrompt("");
+    }
+  }, [userInput, selectedPrompt, isGenerating, onSendMessage]);
+
+  const handleClearPrompt = useCallback(() => {
+    setSelectedPrompt("");
+  }, []);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -51,51 +62,48 @@ export const ChatInput: FC<ChatInputProps> = ({
     if (onStopGeneration) {
       onStopGeneration();
     }
-  }, [onStopGeneration]);
-  return (
+  }, [onStopGeneration]);  return (
     <motion.div
-      className="mx-auto max-w-3xl px-4 pb-4"
+      className="mx-auto max-w-3xl px-4 pb-4 space-y-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {" "}
-      {/* Prompt Selector */}
-      <div className="mb-3 flex justify-start">
-        <PromptSelector onPromptSelect={setSelectedPromptContent} />
+      {/* Prompt Selector - Above the input */}
+      <div className="flex justify-start">
+        <PromptSelector onPromptSelect={handlePromptSelect} />
       </div>
+
       {/* Selected Prompt Indicator */}
-      <AnimatePresence>
-        {selectedPromptContent && (
-          <motion.div
-            className="mb-3 p-3 rounded-lg bg-blue-50/80 backdrop-blur-sm border border-blue-200/50"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-xs text-blue-600 font-medium mb-1">
-                  Selected Prompt:
-                </p>
-                <p className="text-sm text-blue-800 line-clamp-2">
-                  {selectedPromptContent.substring(0, 100)}
-                  {selectedPromptContent.length > 100 ? "..." : ""}
-                </p>
+      {selectedPrompt && (
+        <motion.div
+          className="bg-blue-50 border border-blue-200 rounded-lg p-3"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="text-sm font-medium text-blue-700 mb-1">
+                Selected Prompt:
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-100"
-                onClick={() => setSelectedPromptContent("")}
-              >
-                ×
-              </Button>
+              <div className="text-sm text-blue-600 line-clamp-2">
+                {selectedPrompt.length > 100 
+                  ? `${selectedPrompt.substring(0, 100)}...` 
+                  : selectedPrompt}
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <button
+              onClick={handleClearPrompt}
+              className="ml-2 text-blue-500 hover:text-blue-700 transition-colors"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Chat Input */}
       <motion.div
         className={cn(
           "relative rounded-2xl border bg-white/90 backdrop-blur-xl shadow-lg transition-all duration-300",
@@ -109,16 +117,10 @@ export const ChatInput: FC<ChatInputProps> = ({
             "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         }}
         transition={{ duration: 0.2 }}
-      >
-        {" "}
-        <TextareaAutosize
+      >        <TextareaAutosize
           textareaRef={chatInputRef as React.RefObject<HTMLTextAreaElement>}
           className="w-full resize-none border-none bg-transparent px-4 py-3 pr-12 text-base placeholder-gray-400 focus:outline-none"
-          placeholder={
-            selectedPromptContent
-              ? "Add your message to the prompt..."
-              : "Ask anything..."
-          }
+          placeholder={selectedPrompt ? "Add your message to the prompt..." : "Ask anything..."}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

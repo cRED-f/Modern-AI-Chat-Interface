@@ -43,7 +43,6 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
-
   const handleSendMessage = useCallback(
     async (content: string, systemPrompt?: string) => {
       if (!chatId || !content.trim() || isOpenRouterGenerating) return;
@@ -53,16 +52,7 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
         const currentMessages = messages || [];
         const isFirstMessage = currentMessages.length === 0;
 
-        // Store system prompt as the first message if provided and this is the first message
-        if (systemPrompt && isFirstMessage) {
-          await sendMessage({
-            chatId,
-            content: systemPrompt,
-            role: "system",
-          });
-        }
-
-        // Send user message (only the actual user content, not the prompt)
+        // Send user message (only the actual user content, never the prompt)
         await sendMessage({
           chatId,
           content,
@@ -77,25 +67,35 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
             chatId,
             title,
           });
-        } // Prepare messages for OpenRouter API - include ALL messages including system prompts
-        const conversationHistory = (messages || []).map((msg) => ({
-          role: msg.role as "system" | "user" | "assistant",
-          content: msg.content,
-        }));
+        }
 
-        // Add the system prompt if this is the first message (it was just stored)
-        if (systemPrompt && isFirstMessage) {
-          conversationHistory.unshift({
+        // Prepare conversation history - only user and assistant messages from database
+        const conversationHistory = (messages || [])
+          .filter((msg) => msg.role !== "system") // Exclude any system messages from database
+          .map((msg) => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+          }));
+
+        // Add the new user message to conversation history
+        conversationHistory.push({
+          role: "user" as const,
+          content,
+        });
+
+        // Prepare API messages - dynamically add system prompt if provided
+        const apiMessages = [];
+        
+        // Always add system prompt first if provided
+        if (systemPrompt) {
+          apiMessages.push({
             role: "system" as const,
             content: systemPrompt,
           });
         }
-
-        // Add the new user message
-        conversationHistory.push({
-          role: "user" as const,
-          content,
-        }); // Get AI response from OpenRouter
+        
+        // Add all conversation history after the system prompt
+        apiMessages.push(...conversationHistory);// Get AI response from OpenRouter
         console.log(conversationHistory);
         if (apiKey && sendToOpenRouter) {
           const aiResponse = await sendToOpenRouter(conversationHistory, {

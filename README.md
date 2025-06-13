@@ -2,10 +2,17 @@
 
 A developer-focused chat interface built with Next.js, TypeScript, Tailwind CSS, and Convex database. Features a clean, modern design with real-time messaging, conversation management, and AI model integration.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-15.0-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3.0-blue)
+
+## 🤷‍♂️ Demo
+
+![demo1](https://github.com/user-attachments/assets/304f8354-ca8f-464b-a7e8-6efcd4c7cb6c)
+![demo2](https://github.com/user-attachments/assets/16259eee-c253-416a-80b7-e12d72275590)
+![demo5](https://github.com/user-attachments/assets/22875192-4ed1-4f21-8f5e-5614f700eea7)
+![demo4](https://github.com/user-attachments/assets/11299a8c-c755-40bc-8d89-24372cfe40bf)
+![demo3](https://github.com/user-attachments/assets/0f9f0d6c-c786-4e31-8a1b-1dc1c6279c43)
 
 ## ✨ Features
 
@@ -21,7 +28,6 @@ A developer-focused chat interface built with Next.js, TypeScript, Tailwind CSS,
 
 - **Modern Interface**: Clean, intuitive design inspired by modern chat applications
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Dark/Light Theme Support**: Automatic theme switching
 - **Smooth Animations**: Framer Motion powered transitions
 - **Real-time Updates**: Live conversation synchronization
 
@@ -55,8 +61,8 @@ A developer-focused chat interface built with Next.js, TypeScript, Tailwind CSS,
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/modern-ai-chat-interface.git
-   cd modern-ai-chat-interface
+   git clone https://github.com/cRED-f/Modern-AI-Chat-Interface.git
+   cd Modern-AI-Chat-Interface
    ```
 
 2. **Install dependencies**
@@ -197,72 +203,9 @@ All components are modular and can be easily customized:
 - Add new functionality by extending existing hooks
 - Create new components following the established patterns
 
-## 🚀 Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. **Push your code to GitHub**
-
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
-
-2. **Connect to Vercel**
-
-   - Visit [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Vercel will automatically detect Next.js configuration
-
-3. **Add environment variables**
-   In your Vercel dashboard, add:
-
-   - `CONVEX_DEPLOYMENT`
-   - `NEXT_PUBLIC_CONVEX_URL`
-
-4. **Deploy**
-   Vercel will automatically build and deploy your application.
-
-### Deploy to Other Platforms
-
-The application can be deployed to any platform that supports Next.js:
-
-- **Netlify**: Use the Next.js build plugin
-- **Railway**: Connect your GitHub repository
-- **Docker**: Use the included Dockerfile (if you create one)
-
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
-
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Make your changes**
-4. **Commit your changes**
-   ```bash
-   git commit -m "Add amazing feature"
-   ```
-5. **Push to your branch**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-6. **Open a Pull Request**
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Use meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-- Follow the existing code style
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+We welcome contributions!
 
 ## 🙏 Acknowledgments
 
@@ -272,22 +215,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Tailwind CSS](https://tailwindcss.com/) - Styling framework
 - [Framer Motion](https://framer.com/motion/) - Animation library
 - [Tabler Icons](https://tabler-icons.io/) - Icon set
-
-## 💬 Support
-
-- **Documentation**: Check the [Wiki](https://github.com/yourusername/modern-ai-chat-interface/wiki)
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/yourusername/modern-ai-chat-interface/issues)
-- **Discussions**: Join the community in [GitHub Discussions](https://github.com/yourusername/modern-ai-chat-interface/discussions)
-
-## 🔄 Roadmap
-
-- [ ] **Authentication System**: User accounts and private conversations
-- [ ] **Voice Messages**: Speech-to-text and text-to-speech
-- [ ] **File Uploads**: Image and document analysis
-- [ ] **Plugin System**: Extensible architecture for custom features
-- [ ] **Mobile App**: React Native version
-- [ ] **Collaborative Chats**: Multi-user conversations
-- [ ] **Advanced Analytics**: Conversation insights and metrics
 
 ---
 
