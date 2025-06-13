@@ -61,8 +61,8 @@ A developer-focused chat interface built with Next.js, TypeScript, Tailwind CSS,
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/modern-ai-chat-interface.git
-   cd modern-ai-chat-interface
+   git clone https://github.com/cRED-f/Modern-AI-Chat-Interface.git
+   cd Modern-AI-Chat-Interface
    ```
 
 2. **Install dependencies**
