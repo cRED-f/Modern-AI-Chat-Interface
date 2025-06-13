@@ -44,7 +44,8 @@ export const ChatInput: FC<ChatInputProps> = ({
 
   const handleAssistantPromptSelect = useCallback((promptContent: string) => {
     setSelectedAssistantPrompt(promptContent);
-  }, []);  const handleSendMessage = useCallback(() => {
+  }, []);
+  const handleSendMessage = useCallback(() => {
     if (!userInput.trim() || isGenerating) return;
 
     // Send user input to display in chat, and selected prompts as system messages
@@ -93,12 +94,12 @@ export const ChatInput: FC<ChatInputProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {" "}      {/* Prompt Selectors - Above the input */}
+      {" "}
+      {/* Prompt Selectors - Above the input */}
       <div className="flex justify-between gap-3">
         <PromptSelector onPromptSelect={handlePromptSelect} />
         <AssistantPromptSelector onPromptSelect={handleAssistantPromptSelect} />
       </div>
-
       {/* Assistant Analyzing Indicator */}
       {isAssistantAnalyzing && (
         <motion.div
@@ -110,15 +111,22 @@ export const ChatInput: FC<ChatInputProps> = ({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-purple-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+              <div
+                className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"
+                style={{ animationDelay: "0.2s" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-purple-300 rounded-full animate-pulse"
+                style={{ animationDelay: "0.4s" }}
+              ></div>
             </div>
             <div className="text-sm font-medium text-purple-700">
               Assistant is analyzing the conversation...
             </div>
           </div>
         </motion.div>
-      )}{" "}      {/* Selected Prompt Indicators - Only show for first message */}
+      )}{" "}
+      {/* Selected Prompt Indicators - Only show for first message */}
       {isFirstMessage && selectedAssistantPrompt && (
         <motion.div
           className="bg-purple-50 border border-purple-200 rounded-lg p-3"

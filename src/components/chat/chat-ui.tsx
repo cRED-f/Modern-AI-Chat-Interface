@@ -39,10 +39,8 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
     error: openRouterError,
   } = useOpenRouter(apiKey);
 
-  const {
-    analyzeConversation,
-    isAnalyzing: isAssistantAnalyzing,
-  } = useAssistantAnalysis(apiKey);
+  const { analyzeConversation, isAnalyzing: isAssistantAnalyzing } =
+    useAssistantAnalysis(apiKey);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -402,7 +400,9 @@ Please incorporate this analysis into your response while maintaining your natur
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-      >        <ChatInput
+      >
+        {" "}
+        <ChatInput
           onSendMessage={handleSendMessage}
           isGenerating={isOpenRouterGenerating}
           isAssistantAnalyzing={isAssistantAnalyzing}
