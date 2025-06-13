@@ -17,23 +17,29 @@ export class AssistantAnalysisService {
   constructor(apiKey: string) {
     this.openRouterService = new OpenRouterService(apiKey);
   }
-
   async analyzeConversation(
     conversationHistory: ConversationMessage[],
     assistantPrompt: string,
     config: AnalysisConfig = {}
   ): Promise<string | null> {
     try {
+      // Use database values from config, with fallbacks only if not provided
       const {
-        modelName = "anthropic/claude-3.5-sonnet:beta",
-        temperature = 0.3,
-        maxContextLength = 2000,
+        modelName = "anthropic/claude-3.5-sonnet:beta", // Fallback if no database value
+        temperature = 0.3, // Fallback if no database value
+        maxContextLength = 2000, // Fallback if no database value
       } = config;
 
       console.log("🤖 ASSISTANT MODEL: Starting conversation analysis...");
-      console.log(`📊 Model: ${modelName}`);
-      console.log(`🌡️ Temperature: ${temperature}`);
-      console.log(`📏 Max Context: ${maxContextLength}`);
+      console.log(
+        `📊 Model: ${modelName} ${config.modelName ? "(from database)" : "(fallback)"}`
+      );
+      console.log(
+        `🌡️ Temperature: ${temperature} ${config.temperature !== undefined ? "(from database)" : "(fallback)"}`
+      );
+      console.log(
+        `📏 Max Context: ${maxContextLength} ${config.maxContextLength !== undefined ? "(from database)" : "(fallback)"}`
+      );
 
       // Prepare messages for assistant analysis
       const analysisMessages = [
