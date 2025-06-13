@@ -6,6 +6,7 @@ import { api } from "../../../convex/_generated/api";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { useOpenRouter } from "@/hooks/useOpenRouter";
+import { useAssistantAnalysis } from "@/hooks/useAssistantAnalysis";
 import { OPENROUTER_CONFIG } from "@/lib/openrouter";
 import { SetupInstructions } from "@/components/setup-instructions";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,10 +27,11 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
   const currentChat = chats?.find((chat) => chat._id === chatId);
   const sendMessage = useMutation(api.messages.sendMessage);
   const updateChatTitle = useMutation(api.messages.updateChatTitle);
-
   // Get API settings from database
   const apiSettings = useQuery(api.settings.getApiSettings);
   const apiKey = apiSettings?.apiKey;
+  // Get assistant configuration and prompts
+  const assistantConfig = useQuery(api.assistants.getDefaultAssistant);
 
   const {
     sendMessage: sendToOpenRouter,
@@ -37,14 +39,26 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
     error: openRouterError,
   } = useOpenRouter(apiKey);
 
+  const {
+    analyzeConversation,
+    isAnalyzing: isAssistantAnalyzing,
+  } = useAssistantAnalysis(apiKey);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  // Calculate if this is the first message (no messages exist yet)
+  const isFirstMessage = (messages || []).length === 0;
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
   const handleSendMessage = useCallback(
-    async (content: string, systemPrompt?: string) => {
+    async (
+      content: string,
+      systemPrompt?: string,
+      assistantPrompt?: string
+    ) => {
       if (!chatId || !content.trim() || isOpenRouterGenerating) return;
 
       try {
@@ -83,22 +97,92 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
           content,
         });
 
+        // Check if we should run assistant analysis
+        let assistantAnalysis = "";
+        const shouldRunAssistantAnalysis =
+          assistantConfig?.isDefault && assistantPrompt;
+
+        if (shouldRunAssistantAnalysis) {
+          // Calculate total exchanges (user + assistant pairs)
+          const totalExchanges = Math.floor(conversationHistory.length / 2);
+
+          // Check if we should trigger analysis based on configuration
+          const shouldTrigger =
+            totalExchanges >= 3 && // First activation after 3 exchanges
+            totalExchanges % (assistantConfig.activeAfterQuestions || 3) === 0; // Then based on setting
+
+          console.log("🤖 Assistant Analysis Check:", {
+            totalExchanges,
+            shouldTrigger,
+            activeAfterQuestions: assistantConfig.activeAfterQuestions,
+            hasAssistantPrompt: !!assistantPrompt,
+            assistantConfigDefault: assistantConfig.isDefault,
+          });
+
+          if (shouldTrigger) {
+            console.log("🔍 Triggering assistant analysis...");
+
+            try {
+              const analysis = await analyzeConversation(
+                conversationHistory,
+                assistantPrompt,
+                {
+                  modelName: assistantConfig.modelName,
+                  temperature: assistantConfig.temperature,
+                  maxContextLength: assistantConfig.maxContextLength,
+                }
+              );
+
+              if (analysis) {
+                assistantAnalysis = analysis;
+                console.log(
+                  "✅ Assistant analysis completed:",
+                  analysis.substring(0, 100) + "..."
+                );
+              } else {
+                console.warn("⚠️ Assistant analysis returned empty result");
+              }
+            } catch (error) {
+              console.error("❌ Assistant analysis failed:", error);
+              // Continue without analysis if it fails
+            }
+          }
+        }
+
+        // Prepare enhanced system prompt with assistant analysis
+        let enhancedSystemPrompt = systemPrompt || "";
+
+        if (assistantAnalysis) {
+          enhancedSystemPrompt = `${systemPrompt || ""}
+
+ASSISTANT ANALYSIS (PRIORITY EXECUTION):
+${assistantAnalysis}
+
+Please incorporate this analysis into your response while maintaining your natural conversation style.`;
+
+          console.log("🎯 Enhanced system prompt with assistant analysis");
+        }
+
         // Prepare API messages - dynamically add system prompt if provided
         const apiMessages = [];
-        
+
         // Always add system prompt first if provided
-        if (systemPrompt) {
+        if (enhancedSystemPrompt) {
           apiMessages.push({
             role: "system" as const,
-            content: systemPrompt,
+            content: enhancedSystemPrompt,
           });
         }
-        
+
         // Add all conversation history after the system prompt
-        apiMessages.push(...conversationHistory);// Get AI response from OpenRouter
-        console.log(conversationHistory);
+        apiMessages.push(...conversationHistory); // Get AI response from OpenRouter
+        console.log(
+          "🚀 Sending to OpenRouter with messages:",
+          apiMessages.length,
+          "messages"
+        );
         if (apiKey && sendToOpenRouter) {
-          const aiResponse = await sendToOpenRouter(conversationHistory, {
+          const aiResponse = await sendToOpenRouter(apiMessages, {
             model: apiSettings?.modelName || OPENROUTER_CONFIG.defaultModel,
             temperature: apiSettings?.temperature ?? 0.0,
             maxTokens: apiSettings?.maxContextLength ?? 0,
@@ -149,6 +233,8 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
       sendToOpenRouter,
       openRouterError,
       isOpenRouterGenerating,
+      assistantConfig,
+      analyzeConversation,
     ]
   );
 
@@ -316,10 +402,11 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-      >
-        <ChatInput
+      >        <ChatInput
           onSendMessage={handleSendMessage}
           isGenerating={isOpenRouterGenerating}
+          isAssistantAnalyzing={isAssistantAnalyzing}
+          isFirstMessage={isFirstMessage}
           onStopGeneration={handleStopGeneration}
         />
       </motion.div>
