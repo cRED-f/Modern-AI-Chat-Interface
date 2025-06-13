@@ -38,6 +38,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   const handleInputChange = useCallback((value: string) => {
     setUserInput(value);
   }, []);
+
   const handlePromptSelect = useCallback((promptContent: string) => {
     setSelectedPrompt(promptContent);
   }, []);
@@ -45,6 +46,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   const handleAssistantPromptSelect = useCallback((promptContent: string) => {
     setSelectedAssistantPrompt(promptContent);
   }, []);
+
   const handleSendMessage = useCallback(() => {
     if (!userInput.trim() || isGenerating) return;
 
@@ -64,6 +66,7 @@ export const ChatInput: FC<ChatInputProps> = ({
     isGenerating,
     onSendMessage,
   ]);
+
   const handleClearPrompt = useCallback(() => {
     setSelectedPrompt("");
   }, []);
@@ -87,6 +90,7 @@ export const ChatInput: FC<ChatInputProps> = ({
       onStopGeneration();
     }
   }, [onStopGeneration]);
+
   return (
     <motion.div
       className="mx-auto max-w-3xl px-4 pb-4 space-y-2"
@@ -94,12 +98,12 @@ export const ChatInput: FC<ChatInputProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {" "}
       {/* Prompt Selectors - Above the input */}
       <div className="flex justify-between gap-3">
         <PromptSelector onPromptSelect={handlePromptSelect} />
         <AssistantPromptSelector onPromptSelect={handleAssistantPromptSelect} />
       </div>
+
       {/* Assistant Analyzing Indicator */}
       {isAssistantAnalyzing && (
         <motion.div
@@ -125,7 +129,8 @@ export const ChatInput: FC<ChatInputProps> = ({
             </div>
           </div>
         </motion.div>
-      )}{" "}
+      )}
+
       {/* Selected Prompt Indicators - Only show for first message */}
       {isFirstMessage && selectedAssistantPrompt && (
         <motion.div
@@ -154,6 +159,7 @@ export const ChatInput: FC<ChatInputProps> = ({
           </div>
         </motion.div>
       )}
+
       {isFirstMessage && selectedPrompt && (
         <motion.div
           className="bg-blue-50 border border-blue-200 rounded-lg p-3"
@@ -181,6 +187,7 @@ export const ChatInput: FC<ChatInputProps> = ({
           </div>
         </motion.div>
       )}
+
       {/* Chat Input */}
       <motion.div
         className={cn(
@@ -196,7 +203,6 @@ export const ChatInput: FC<ChatInputProps> = ({
         }}
         transition={{ duration: 0.2 }}
       >
-        {" "}
         <TextareaAutosize
           textareaRef={chatInputRef as React.RefObject<HTMLTextAreaElement>}
           className="w-full resize-none border-none bg-transparent px-4 py-3 pr-12 text-base placeholder-gray-400 focus:outline-none"

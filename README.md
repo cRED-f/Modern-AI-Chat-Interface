@@ -206,10 +206,14 @@ All components are modular and can be easily customized:
 ## 🤝 Contributing
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 We welcome contributions! 
 =======
 We welcome contributions!
 >>>>>>> 92c3f12 (add assistant support)
+=======
+We welcome contributions!
+>>>>>>> 92c3f12b33e598b294b171bab12249744effc220
 
 ## 🙏 Acknowledgments
 
@@ -222,7 +226,10 @@ We welcome contributions!
 <<<<<<< HEAD
 =======
 
+<<<<<<< HEAD
 >>>>>>> 92c3f12 (add assistant support)
+=======
+>>>>>>> 92c3f12b33e598b294b171bab12249744effc220
 ---
 
 **Star ⭐ this repository if you find it helpful!**

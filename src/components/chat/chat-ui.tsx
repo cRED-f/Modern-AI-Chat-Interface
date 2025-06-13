@@ -69,9 +69,7 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
           chatId,
           content,
           role: "user",
-        });
-
-        // Update chat title with first message (truncated)
+        }); // Update chat title with first message (truncated)
         if (isFirstMessage) {
           const title =
             content.length > 50 ? content.substring(0, 47) + "..." : content;
@@ -173,7 +171,9 @@ Please incorporate this analysis into your response while maintaining your natur
         }
 
         // Add all conversation history after the system prompt
-        apiMessages.push(...conversationHistory); // Get AI response from OpenRouter
+        apiMessages.push(...conversationHistory);
+
+        // Get AI response from OpenRouter
         console.log(
           "🚀 Sending to OpenRouter with messages:",
           apiMessages.length,
