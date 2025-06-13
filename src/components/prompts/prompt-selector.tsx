@@ -16,7 +16,12 @@ export const PromptSelector: FC<PromptSelectorProps> = ({ onPromptSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
 
-  const prompts = useQuery(api.prompts.getPrompts) || [];
+  const allPrompts = useQuery(api.prompts.getPrompts) || [];
+
+  // Filter prompts to show only "main model" prompts
+  const prompts = allPrompts.filter(
+    (prompt) => (prompt.targetModel || "main") === "main"
+  );
 
   const handlePromptSelect = useCallback(
     (promptId: string, promptContent: string) => {

@@ -22,6 +22,7 @@ interface PromptData {
   _id: Id<"prompts">;
   name: string;
   content: string;
+  targetModel?: "main" | "assistant";
   createdAt: number;
   updatedAt: number;
 }
@@ -49,8 +50,25 @@ const PromptItem: FC<PromptItemProps> = ({ prompt, onEdit, onDelete }) => {
         >
           {" "}
           <div className="flex items-center space-x-2 mb-1">
-            <div className="w-2 h-2 bg-white/80 rounded-full shadow-sm"></div>
+            <div
+              className={`w-2 h-2 rounded-full shadow-sm ${
+                (prompt.targetModel || "main") === "main"
+                  ? "bg-blue-500"
+                  : "bg-purple-500"
+              }`}
+            ></div>
             <h3 className="text-sm font-medium text-gray-800">{prompt.name}</h3>
+            <span
+              className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                (prompt.targetModel || "main") === "main"
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : "bg-purple-100 text-purple-700 border border-purple-200"
+              }`}
+            >
+              {(prompt.targetModel || "main") === "main"
+                ? "Main Model"
+                : "Assistant"}
+            </span>
           </div>
           <AnimatePresence>
             {isExpanded && (
@@ -114,7 +132,11 @@ const PromptItem: FC<PromptItemProps> = ({ prompt, onEdit, onDelete }) => {
 
 interface PromptFormProps {
   prompt?: PromptData;
-  onSave: (data: { name: string; content: string }) => void;
+  onSave: (data: {
+    name: string;
+    content: string;
+    targetModel?: "main" | "assistant";
+  }) => void;
   onCancel: () => void;
   isLoading: boolean;
 }
@@ -127,12 +149,17 @@ const PromptForm: FC<PromptFormProps> = ({
 }) => {
   const [name, setName] = useState(prompt?.name || "");
   const [content, setContent] = useState(prompt?.content || "");
+  const [targetModel, setTargetModel] = useState<"main" | "assistant">(
+    prompt?.targetModel || "main"
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() && content.trim()) {
       onSave({
         name: name.trim(),
         content: content.trim(),
+        targetModel: targetModel,
       });
     }
   };
@@ -156,6 +183,41 @@ const PromptForm: FC<PromptFormProps> = ({
             className="bg-white/50 backdrop-blur-sm"
             required
           />
+        </div>
+        {/* Target Model Selection */}
+        <div className="space-y-2">
+          <Label>Target Model</Label>
+          <div className="flex items-center space-x-4">
+            <motion.button
+              type="button"
+              onClick={() => setTargetModel("main")}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                targetModel === "main"
+                  ? "bg-blue-100 border-blue-300 text-blue-700"
+                  : "bg-white/50 border-gray-200 text-gray-600 hover:bg-white/70"
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-sm font-medium">Main Model</span>
+            </motion.button>
+
+            <motion.button
+              type="button"
+              onClick={() => setTargetModel("assistant")}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                targetModel === "assistant"
+                  ? "bg-purple-100 border-purple-300 text-purple-700"
+                  : "bg-white/50 border-gray-200 text-gray-600 hover:bg-white/70"
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-sm font-medium">Assistant</span>
+            </motion.button>
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="prompt-content">Content</Label>
@@ -220,7 +282,11 @@ export const PromptsManager: FC = () => {
     setIsCreating(false);
   }, []);
   const handleSave = useCallback(
-    async (data: { name: string; content: string }) => {
+    async (data: {
+      name: string;
+      content: string;
+      targetModel: "main" | "assistant";
+    }) => {
       setIsLoading(true);
       try {
         if (editingPrompt) {

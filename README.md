@@ -205,7 +205,11 @@ All components are modular and can be easily customized:
 
 ## 🤝 Contributing
 
+<<<<<<< HEAD
 We welcome contributions! 
+=======
+We welcome contributions!
+>>>>>>> 92c3f12 (add assistant support)
 
 ## 🙏 Acknowledgments
 
@@ -215,6 +219,10 @@ We welcome contributions!
 - [Tailwind CSS](https://tailwindcss.com/) - Styling framework
 - [Framer Motion](https://framer.com/motion/) - Animation library
 - [Tabler Icons](https://tabler-icons.io/) - Icon set
+<<<<<<< HEAD
+=======
+
+>>>>>>> 92c3f12 (add assistant support)
 ---
 
 **Star ⭐ this repository if you find it helpful!**
