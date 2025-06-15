@@ -17,9 +17,13 @@ interface ChatUIProps {
 
 export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const messages = useQuery(
     api.messages.getMessages,
+    chatId ? { chatId } : "skip"
+  );
+
+  const messagesForUI = useQuery(
+    api.messages.getMessagesForUI,
     chatId ? { chatId } : "skip"
   );
 
@@ -43,10 +47,11 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
     useAssistantAnalysis(apiKey);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  // Calculate if this is the first message (no messages exist yet)
-  const isFirstMessage = (messages || []).length === 0;
+  }, []); // Calculate if this is the first message (no user/ai messages exist yet, excluding assistant messages)
+  const isFirstMessage =
+    (messagesForUI || []).filter(
+      (msg) => msg.role === "user" || msg.role === "ai"
+    ).length === 0;
 
   useEffect(() => {
     scrollToBottom();
@@ -77,13 +82,11 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
             chatId,
             title,
           });
-        }
-
-        // Prepare conversation history - only user and assistant messages from database
+        } // Prepare conversation history - only user, ai, and assistant messages from database
         const conversationHistory = (messages || [])
           .filter((msg) => msg.role !== "system") // Exclude any system messages from database
           .map((msg) => ({
-            role: msg.role as "user" | "assistant",
+            role: msg.role as "user" | "ai" | "assistant",
             content: msg.content,
           }));
 
@@ -128,13 +131,19 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
                   maxContextLength: assistantConfig.maxContextLength,
                 }
               );
-
               if (analysis) {
                 assistantAnalysis = analysis;
                 console.log(
                   "✅ Assistant analysis completed:",
                   analysis.substring(0, 100) + "..."
                 );
+
+                // Save assistant analysis as a separate message with role "assistant"
+                await sendMessage({
+                  chatId,
+                  content: analysis,
+                  role: "assistant",
+                });
               } else {
                 console.warn("⚠️ Assistant analysis returned empty result");
               }
@@ -168,10 +177,13 @@ Please incorporate this analysis into your response while maintaining your natur
             role: "system" as const,
             content: enhancedSystemPrompt,
           });
-        }
-
-        // Add all conversation history after the system prompt
-        apiMessages.push(...conversationHistory);
+        } // Add all conversation history after the system prompt - map 'ai' to 'assistant' for OpenRouter
+        apiMessages.push(
+          ...conversationHistory.map((msg) => ({
+            role: msg.role === "ai" ? ("assistant" as const) : msg.role,
+            content: msg.content,
+          }))
+        );
 
         // Get AI response from OpenRouter
         console.log(
@@ -185,12 +197,11 @@ Please incorporate this analysis into your response while maintaining your natur
             temperature: apiSettings?.temperature ?? 0.0,
             maxTokens: apiSettings?.maxContextLength ?? 0,
           });
-
           if (aiResponse) {
             await sendMessage({
               chatId,
               content: aiResponse,
-              role: "assistant",
+              role: "ai",
             });
           } else {
             // Fallback response if OpenRouter fails
@@ -199,7 +210,7 @@ Please incorporate this analysis into your response while maintaining your natur
               content:
                 openRouterError ||
                 "Sorry, I encountered an error processing your request. Please try again.",
-              role: "assistant",
+              role: "ai",
             });
           }
         } else {
@@ -208,7 +219,7 @@ Please incorporate this analysis into your response while maintaining your natur
             chatId,
             content:
               "Please configure your OpenRouter API key in the environment variables to enable AI responses.",
-            role: "assistant",
+            role: "ai",
           });
         }
       } catch (error) {
@@ -217,7 +228,7 @@ Please incorporate this analysis into your response while maintaining your natur
           chatId,
           content:
             "An error occurred while processing your message. Please try again.",
-          role: "assistant",
+          role: "ai",
         });
       }
     },
@@ -375,13 +386,14 @@ Please incorporate this analysis into your response while maintaining your natur
             </motion.div>
           )}{" "}
           <AnimatePresence mode="wait">
+            {" "}
             <ChatMessages
-              messages={(messages || [])
+              messages={(messagesForUI || [])
                 .filter((msg) => msg.role !== "system") // Hide system messages from UI
                 .map((msg) => ({
                   _id: msg._id,
                   content: msg.content,
-                  role: msg.role as "user" | "assistant",
+                  role: msg.role as "user" | "ai",
                   timestamp: msg.timestamp,
                   chatId: msg.chatId,
                 }))}

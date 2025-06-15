@@ -19,12 +19,11 @@ export function MessageInput({ chatId, onMessageSent }: MessageInputProps) {
     const userMessage = message.trim();
     setMessage("");
     setIsLoading(true);
-
     try {
       setTimeout(async () => {
         await sendMessage({
           content: userMessage,
-          role: "assistant",
+          role: "ai",
           chatId,
         });
 

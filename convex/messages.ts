@@ -5,11 +5,17 @@ import { v } from "convex/values";
 export const getMessages = query({
   args: { chatId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const messages = await ctx.db
       .query("messages")
       .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
       .order("asc")
       .collect();
+
+    // Map any existing "assistant" roles to "ai" for backward compatibility
+    return messages.map((msg) => ({
+      ...msg,
+      role: msg.role === "assistant" ? ("ai" as const) : msg.role,
+    }));
   },
 });
 
@@ -19,6 +25,7 @@ export const sendMessage = mutation({
     content: v.string(),
     role: v.union(
       v.literal("user"),
+      v.literal("ai"),
       v.literal("assistant"),
       v.literal("system")
     ),
@@ -100,5 +107,25 @@ export const updateChatTitle = mutation({
         updatedAt: Date.now(),
       });
     }
+  },
+});
+
+// Get messages for UI display (excludes assistant messages)
+export const getMessagesForUI = query({
+  args: { chatId: v.string() },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
+      .order("asc")
+      .collect();
+
+    // Filter out assistant messages and map any existing "assistant" roles to "ai" for backward compatibility
+    return messages
+      .filter((msg) => msg.role !== "assistant") // Exclude assistant messages from UI
+      .map((msg) => ({
+        ...msg,
+        role: msg.role === "assistant" ? ("ai" as const) : msg.role, // This line won't trigger due to filter above
+      }));
   },
 });

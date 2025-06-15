@@ -10,7 +10,7 @@ export type ContentType =
 export interface ChatMessage {
   _id: string;
   content: string;
-  role: "user" | "assistant" | "system";
+  role: "user" | "ai" | "assistant" | "system";
   timestamp: number;
   chatId: string;
 }

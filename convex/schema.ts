@@ -6,6 +6,7 @@ export default defineSchema({
     content: v.string(),
     role: v.union(
       v.literal("user"),
+      v.literal("ai"),
       v.literal("assistant"),
       v.literal("system")
     ),

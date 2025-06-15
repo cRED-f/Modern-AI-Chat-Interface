@@ -7,7 +7,7 @@ export interface AnalysisConfig {
 }
 
 export interface ConversationMessage {
-  role: "user" | "assistant";
+  role: "user" | "ai" | "assistant";
   content: string;
 }
 
@@ -17,29 +17,18 @@ export class AssistantAnalysisService {
   constructor(apiKey: string) {
     this.openRouterService = new OpenRouterService(apiKey);
   }
+
   async analyzeConversation(
     conversationHistory: ConversationMessage[],
     assistantPrompt: string,
     config: AnalysisConfig = {}
   ): Promise<string | null> {
     try {
-      // Use database values from config, with fallbacks only if not provided
       const {
-        modelName = "anthropic/claude-3.5-sonnet:beta", // Fallback if no database value
-        temperature = 0.3, // Fallback if no database value
-        maxContextLength = 2000, // Fallback if no database value
+        modelName = "anthropic/claude-3.5-sonnet:beta",
+        temperature = 0.3,
+        maxContextLength = 2000,
       } = config;
-
-      console.log("🤖 ASSISTANT MODEL: Starting conversation analysis...");
-      console.log(
-        `📊 Model: ${modelName} ${config.modelName ? "(from database)" : "(fallback)"}`
-      );
-      console.log(
-        `🌡️ Temperature: ${temperature} ${config.temperature !== undefined ? "(from database)" : "(fallback)"}`
-      );
-      console.log(
-        `📏 Max Context: ${maxContextLength} ${config.maxContextLength !== undefined ? "(from database)" : "(fallback)"}`
-      );
 
       // Prepare messages for assistant analysis
       const analysisMessages = [
@@ -48,7 +37,10 @@ export class AssistantAnalysisService {
           content: assistantPrompt,
         },
         ...conversationHistory.map((msg) => ({
-          role: msg.role as "user" | "assistant",
+          role:
+            msg.role === "ai" || msg.role === "assistant"
+              ? ("assistant" as const)
+              : (msg.role as "user"),
           content: msg.content,
         })),
       ];
