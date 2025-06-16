@@ -4,7 +4,7 @@ import { ChatMessage } from "@/types";
 import { FC, useState } from "react";
 import {
   IconUser,
-  IconRobotFace,
+  IconFileTextAi,
   IconCopy,
   IconEdit,
   IconRepeat,
@@ -39,7 +39,7 @@ export const Message: FC<MessageProps> = ({
     setTimeout(() => setShowCheckmark(false), 2000);
   };
 
-  const isAssistant = message.role === "assistant";
+  const isAssistant = message.role === "ai";
 
   const messageVariants = {
     hidden: {
@@ -74,8 +74,10 @@ export const Message: FC<MessageProps> = ({
       exit="exit"
       layout
       className={cn(
-        "group relative border-b border-white/20 px-4 py-6 backdrop-blur-sm",
-        isAssistant ? "bg-gray-50/50" : "bg-white/50"
+        "group relative border-b border-white/20 px-4 py-6 backdrop-blur-sm transition-all duration-300",
+        isAssistant
+          ? "bg-gradient-to-r from-emerald-50/60 via-green-50/50 to-teal-50/40"
+          : "bg-gradient-to-r from-blue-50/40 via-indigo-50/30 to-white/60"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -99,17 +101,29 @@ export const Message: FC<MessageProps> = ({
             bounce: 0.3,
           }}
         >
+          {" "}
           <motion.div
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl border border-white/30",
+              "flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl border",
               isAssistant
-                ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg"
-                : "bg-gradient-to-br from-blue-500 to-cyan-600 text-white shadow-lg"
+                ? "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg border-emerald-300/50 ring-2 ring-emerald-200/30"
+                : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white shadow-lg border-blue-300/50 ring-2 ring-blue-200/30"
             )}
-            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileHover={{
+              scale: 1.15,
+              rotate: isAssistant ? [0, -5, 5, 0] : [0, 5, -5, 0],
+              boxShadow: isAssistant
+                ? "0 8px 25px rgba(16, 185, 129, 0.4)"
+                : "0 8px 25px rgba(59, 130, 246, 0.4)",
+            }}
             whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3 }}
           >
-            {isAssistant ? <IconRobotFace size={16} /> : <IconUser size={16} />}
+            {isAssistant ? (
+              <IconFileTextAi size={18} className="drop-shadow-sm" />
+            ) : (
+              <IconUser size={18} className="drop-shadow-sm" />
+            )}
           </motion.div>
         </motion.div>
 

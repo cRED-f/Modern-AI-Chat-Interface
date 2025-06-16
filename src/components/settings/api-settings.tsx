@@ -158,7 +158,7 @@ export const ApiSettings: FC = () => {
                 <span className="font-medium text-blue-600">{modelName}</span>
               </div>
             )}
-          </div>
+          </div>{" "}
         </div>
       </div>
     </div>

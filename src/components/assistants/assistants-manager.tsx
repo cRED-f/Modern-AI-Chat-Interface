@@ -296,8 +296,8 @@ export const AssistantsManager: FC = () => {
             <span className="font-medium text-gray-700">
               {activeAfterQuestions} question
               {activeAfterQuestions !== 1 ? "s" : ""}
-            </span>
-          </div>
+            </span>{" "}
+          </div>{" "}
         </div>
       </motion.div>
     </div>

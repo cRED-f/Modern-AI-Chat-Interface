@@ -75,9 +75,10 @@ export const ModelPresets: FC = () => {
           </p>
         </div>
         <div className="space-y-3">
+          {" "}
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-600">
-              Max Context Length
+              Max Response Length (Preference)
             </label>
             <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
               {maxContextLength.toLocaleString()}
@@ -92,9 +93,10 @@ export const ModelPresets: FC = () => {
             onChange={(e) => setMaxContextLength(parseInt(e.target.value))}
             disabled={!isEditing}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          />
+          />{" "}
           <p className="text-xs text-gray-400">
-            Maximum number of tokens for context window (1K - 200K tokens)
+            Maximum tokens for AI responses. This value is passed directly to
+            the AI model.
           </p>
         </div>
       </div>
@@ -133,9 +135,9 @@ export const ModelPresets: FC = () => {
             <span className="font-medium text-gray-700">
               {temperature.toFixed(2)}
             </span>
-          </div>
+          </div>{" "}
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Max Context Length:</span>
+            <span className="text-gray-600">Max Response Length:</span>
             <span className="font-medium text-gray-700">
               {maxContextLength.toLocaleString()} tokens
             </span>

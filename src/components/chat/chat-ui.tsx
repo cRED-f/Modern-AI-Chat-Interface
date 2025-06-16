@@ -7,7 +7,6 @@ import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { useOpenRouter } from "@/hooks/useOpenRouter";
 import { useAssistantAnalysis } from "@/hooks/useAssistantAnalysis";
-import { OPENROUTER_CONFIG } from "@/lib/openrouter";
 import { SetupInstructions } from "@/components/setup-instructions";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -183,19 +182,18 @@ Please incorporate this analysis into your response while maintaining your natur
             role: msg.role === "ai" ? ("assistant" as const) : msg.role,
             content: msg.content,
           }))
-        );
-
-        // Get AI response from OpenRouter
+        ); // Get AI response from OpenRouter
         console.log(
           "🚀 Sending to OpenRouter with messages:",
           apiMessages.length,
           "messages"
         );
-        if (apiKey && sendToOpenRouter) {
+        if (apiKey && sendToOpenRouter && apiSettings?.modelName) {
           const aiResponse = await sendToOpenRouter(apiMessages, {
-            model: apiSettings?.modelName || OPENROUTER_CONFIG.defaultModel,
+            model: apiSettings.modelName,
             temperature: apiSettings?.temperature ?? 0.0,
-            maxTokens: apiSettings?.maxContextLength ?? 0,
+            // Limit output tokens to 8192 to stay within model context limits
+            maxTokens: 8192,
           });
           if (aiResponse) {
             await sendMessage({
@@ -214,11 +212,19 @@ Please incorporate this analysis into your response while maintaining your natur
             });
           }
         } else {
-          // Fallback when no API key is provided
+          // Error when no API key or model is configured
+          let errorMessage = "Configuration required to enable AI responses: ";
+          const missingItems = [];
+
+          if (!apiKey) missingItems.push("OpenRouter API key");
+          if (!apiSettings?.modelName) missingItems.push("Model name");
+
+          errorMessage += missingItems.join(" and ");
+          errorMessage += ". Please configure these in settings.";
+
           await sendMessage({
             chatId,
-            content:
-              "Please configure your OpenRouter API key in the environment variables to enable AI responses.",
+            content: errorMessage,
             role: "ai",
           });
         }

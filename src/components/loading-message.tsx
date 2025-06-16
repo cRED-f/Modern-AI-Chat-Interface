@@ -15,7 +15,7 @@ export const LoadingMessage: FC<LoadingMessageProps> = ({ show }) => {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="group relative border-b border-white/20 bg-gray-50/50 backdrop-blur-sm px-4 py-6"
+          className="group relative border-b border-white/20 bg-gradient-to-r from-emerald-50/60 via-green-50/50 to-teal-50/40 backdrop-blur-sm px-4 py-6"
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -66,7 +66,7 @@ export const LoadingMessage: FC<LoadingMessageProps> = ({ show }) => {
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 ></motion.div>
-                <span className="font-medium">ChatGPT is thinking</span>
+                <span className="font-medium">AI is thinking</span>
                 <div className="flex space-x-1">
                   {dots.map((dot) => (
                     <motion.div

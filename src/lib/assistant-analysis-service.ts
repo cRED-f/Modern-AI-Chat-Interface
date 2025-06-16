@@ -24,11 +24,13 @@ export class AssistantAnalysisService {
     config: AnalysisConfig = {}
   ): Promise<string | null> {
     try {
-      const {
-        modelName = "anthropic/claude-3.5-sonnet:beta",
-        temperature = 0.3,
-        maxContextLength = 2000,
-      } = config;
+      const { modelName, temperature } = config;
+
+      if (!modelName || modelName.trim() === "") {
+        throw new Error(
+          "No assistant model specified. Please configure an assistant model in settings."
+        );
+      }
 
       // Prepare messages for assistant analysis
       const analysisMessages = [
@@ -45,28 +47,16 @@ export class AssistantAnalysisService {
         })),
       ];
 
-      console.log(
-        `📤 Sending ${analysisMessages.length} messages to assistant model`
-      );
-
-      // Get analysis from the assistant model
       const analysis = await this.openRouterService.sendMessage(
         analysisMessages,
         modelName,
         {
           temperature,
-          maxTokens: maxContextLength,
+          maxTokens: 8192,
         }
       );
-
-      if (analysis && analysis.trim()) {
-        console.log("✅ Assistant analysis completed successfully");
-        console.log(`📝 Analysis length: ${analysis.length} characters`);
-        return analysis.trim();
-      } else {
-        console.log("⚠️ Assistant model returned empty analysis");
-        return null;
-      }
+      console.log("✅ Assistant analysis completed:", analysis);
+      return analysis.trim() || null;
     } catch (error) {
       console.error("❌ Assistant analysis failed:", error);
       throw error;
