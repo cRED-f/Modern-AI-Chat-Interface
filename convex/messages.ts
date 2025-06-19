@@ -10,11 +10,8 @@ export const getMessages = query({
       .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
       .order("asc")
       .collect();
-
-    // Map any existing "assistant" roles to "ai" for backward compatibility
     return messages.map((msg) => ({
       ...msg,
-      role: msg.role === "assistant" ? ("ai" as const) : msg.role,
     }));
   },
 });
@@ -110,7 +107,7 @@ export const updateChatTitle = mutation({
   },
 });
 
-// Get messages for UI display (excludes assistant messages)
+// Get messages for UI display (excludes only system messages)
 export const getMessagesForUI = query({
   args: { chatId: v.string() },
   handler: async (ctx, args) => {
@@ -120,12 +117,10 @@ export const getMessagesForUI = query({
       .order("asc")
       .collect();
 
-    // Filter out assistant messages and map any existing "assistant" roles to "ai" for backward compatibility
     return messages
-      .filter((msg) => msg.role !== "assistant") // Exclude assistant messages from UI
+      .filter((msg) => msg.role !== "system") // Only filter out system messages
       .map((msg) => ({
         ...msg,
-        role: msg.role === "assistant" ? ("ai" as const) : msg.role, // This line won't trigger due to filter above
       }));
   },
 });

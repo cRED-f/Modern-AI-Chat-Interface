@@ -46,7 +46,6 @@ export const createAssistant = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
 
-    // If this is being set as default, unset other defaults
     if (args.isDefault) {
       const existingDefaults = await ctx.db
         .query("assistants")
@@ -80,7 +79,6 @@ export const updateAssistant = mutation({
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
 
-    // If this is being set as default, unset other defaults
     if (updates.isDefault) {
       const existingDefaults = await ctx.db
         .query("assistants")

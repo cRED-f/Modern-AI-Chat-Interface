@@ -8,6 +8,7 @@ import {
   IconCopy,
   IconEdit,
   IconRepeat,
+  IconBrain,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,14 +33,42 @@ export const Message: FC<MessageProps> = ({
 }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
-
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
     setShowCheckmark(true);
     setTimeout(() => setShowCheckmark(false), 2000);
   };
+  // Debug: Log the message role
+  console.log(
+    "Message role:",
+    message.role,
+    "Content preview:",
+    message.content.substring(0, 50)
+  );
 
-  const isAssistant = message.role === "ai";
+  const isAI = message.role === "ai";
+  const isAssistant = message.role === "assistant";
+  // Extract reminder content and clean content for assistant messages
+  const getAssistantData = (content: string) => {
+    if (!isAssistant) return { cleanContent: content, reminderContent: null };
+
+    const reminderMatch = content.match(
+      /\[ASSISTANT_REMINDER_START\]([\s\S]*?)\[ASSISTANT_REMINDER_END\]/
+    );
+    const reminderContent = reminderMatch ? reminderMatch[1].trim() : null;
+
+    // Remove assistant reminder tags but keep the actual content
+    const cleanContent = content
+      .replace(
+        /\[ASSISTANT_REMINDER_START\][\s\S]*?\[ASSISTANT_REMINDER_END\]/g,
+        ""
+      )
+      .trim();
+
+    return { cleanContent, reminderContent };
+  };
+
+  const { cleanContent, reminderContent } = getAssistantData(message.content);
 
   const messageVariants = {
     hidden: {
@@ -76,15 +105,19 @@ export const Message: FC<MessageProps> = ({
       className={cn(
         "group relative border-b border-white/20 px-4 py-6 backdrop-blur-sm transition-all duration-300",
         isAssistant
-          ? "bg-gradient-to-r from-emerald-50/60 via-green-50/50 to-teal-50/40"
-          : "bg-gradient-to-r from-blue-50/40 via-indigo-50/30 to-white/60"
+          ? "bg-gradient-to-r from-slate-50/60 via-gray-50/50 to-zinc-50/40"
+          : isAI
+            ? "bg-gradient-to-r from-emerald-50/60 via-green-50/50 to-teal-50/40"
+            : "bg-gradient-to-r from-blue-50/40 via-indigo-50/30 to-white/60"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       whileHover={{
         backgroundColor: isAssistant
-          ? "rgba(249, 250, 251, 0.8)"
-          : "rgba(255, 255, 255, 0.8)",
+          ? "rgba(248, 250, 252, 0.8)"
+          : isAI
+            ? "rgba(249, 250, 251, 0.8)"
+            : "rgba(255, 255, 255, 0.8)",
       }}
       transition={{ duration: 0.2 }}
     >
@@ -106,39 +139,82 @@ export const Message: FC<MessageProps> = ({
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl border",
               isAssistant
-                ? "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg border-emerald-300/50 ring-2 ring-emerald-200/30"
-                : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white shadow-lg border-blue-300/50 ring-2 ring-blue-200/30"
+                ? "bg-gradient-to-br from-gray-500 via-slate-500 to-zinc-600 text-white shadow-lg border-gray-300/50 ring-2 ring-gray-200/30"
+                : isAI
+                  ? "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg border-emerald-300/50 ring-2 ring-emerald-200/30"
+                  : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white shadow-lg border-blue-300/50 ring-2 ring-blue-200/30"
             )}
             whileHover={{
               scale: 1.15,
-              rotate: isAssistant ? [0, -5, 5, 0] : [0, 5, -5, 0],
+              rotate: isAssistant
+                ? [0, -10, 10, 0]
+                : isAI
+                  ? [0, -5, 5, 0]
+                  : [0, 5, -5, 0],
               boxShadow: isAssistant
-                ? "0 8px 25px rgba(16, 185, 129, 0.4)"
-                : "0 8px 25px rgba(59, 130, 246, 0.4)",
+                ? "0 8px 25px rgba(107, 114, 128, 0.4)"
+                : isAI
+                  ? "0 8px 25px rgba(16, 185, 129, 0.4)"
+                  : "0 8px 25px rgba(59, 130, 246, 0.4)",
             }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.3 }}
           >
+            {" "}
             {isAssistant ? (
+              <IconBrain size={18} className="drop-shadow-sm" />
+            ) : isAI ? (
               <IconFileTextAi size={18} className="drop-shadow-sm" />
             ) : (
               <IconUser size={18} className="drop-shadow-sm" />
             )}
           </motion.div>
-        </motion.div>
-
-        {/* Content */}
+        </motion.div>{" "}
+        {/* Content */}{" "}
         <motion.div
           className="flex-1 space-y-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
         >
+          {/* Assistant Reminder (if present) */}
+          {isAssistant && reminderContent && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mb-3 p-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg"
+            >
+              <div className="flex items-start space-x-2">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg
+                    className="w-4 h-4 text-amber-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-800">
+                    Assistant Reminder
+                  </p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    {reminderContent}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Main Content */}
           <div className="prose prose-sm max-w-none text-gray-900">
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+            <ReactMarkdown>{cleanContent}</ReactMarkdown>
           </div>
         </motion.div>
-
         {/* Action Buttons */}
         <motion.div
           className={cn(
@@ -168,8 +244,8 @@ export const Message: FC<MessageProps> = ({
                 </Button>
               </motion.div>
             }
-          />
-          {!isAssistant && onEdit && (
+          />{" "}
+          {message.role === "user" && onEdit && (
             <WithTooltip
               delayDuration={1000}
               side="bottom"
@@ -191,7 +267,7 @@ export const Message: FC<MessageProps> = ({
               }
             />
           )}{" "}
-          {isAssistant && isLast && onRegenerate && (
+          {isAI && isLast && onRegenerate && (
             <WithTooltip
               delayDuration={1000}
               side="bottom"

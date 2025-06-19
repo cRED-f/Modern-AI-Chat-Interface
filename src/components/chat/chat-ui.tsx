@@ -81,11 +81,12 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
             chatId,
             title,
           });
-        } // Prepare conversation history - only user, ai, and assistant messages from database
+        } // Prepare conversation history - only user and ai messages for main AI model
+        // Exclude assistant messages as they are analysis/suggestions, not part of main conversation
         const conversationHistory = (messages || [])
-          .filter((msg) => msg.role !== "system") // Exclude any system messages from database
+          .filter((msg) => msg.role !== "system" && msg.role !== "assistant") // Exclude system and assistant messages
           .map((msg) => ({
-            role: msg.role as "user" | "ai" | "assistant",
+            role: msg.role as "user" | "ai",
             content: msg.content,
           }));
 
@@ -93,16 +94,17 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
         conversationHistory.push({
           role: "user" as const,
           content,
-        });
-
-        // Check if we should run assistant analysis
+        }); // Check if we should run assistant analysis
         let assistantAnalysis = "";
         const shouldRunAssistantAnalysis =
           assistantConfig?.isDefault && assistantPrompt;
 
         if (shouldRunAssistantAnalysis) {
-          // Calculate total exchanges (user + assistant pairs)
-          const totalExchanges = Math.floor(conversationHistory.length / 2);
+          // Calculate total exchanges based on user+ai pairs (excluding assistant messages)
+          const userAiMessages = (messages || []).filter(
+            (msg) => msg.role === "user" || msg.role === "ai"
+          );
+          const totalExchanges = Math.floor((userAiMessages.length + 1) / 2); // +1 for current user message
 
           // Check if we should trigger analysis based on configuration
           const shouldTrigger =
@@ -394,12 +396,12 @@ Please incorporate this analysis into your response while maintaining your natur
           <AnimatePresence mode="wait">
             {" "}
             <ChatMessages
-              messages={(messagesForUI || [])
-                .filter((msg) => msg.role !== "system") // Hide system messages from UI
+              messages={(messages || [])
+                .filter((msg) => msg.role !== "system") // Hide system messages from UI, but show assistant
                 .map((msg) => ({
                   _id: msg._id,
                   content: msg.content,
-                  role: msg.role as "user" | "ai",
+                  role: msg.role as "user" | "ai" | "assistant",
                   timestamp: msg.timestamp,
                   chatId: msg.chatId,
                 }))}

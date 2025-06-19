@@ -96,7 +96,7 @@ function HomeContent() {
         />
       </div>
 
-      {/* Fixed Sidebar with animation */}
+      {/* Fixed Sidebar */}
       <motion.div
         className="fixed left-0 top-0 h-full z-10 isolate"
         initial={{ x: -100, opacity: 0 }}
