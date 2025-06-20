@@ -16,7 +16,6 @@ export const saveApiSettings = mutation({
     provider: v.optional(v.string()),
     modelName: v.optional(v.string()),
     temperature: v.optional(v.number()),
-    maxContextLength: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -32,8 +31,6 @@ export const saveApiSettings = mutation({
       if (args.modelName !== undefined) updateData.modelName = args.modelName;
       if (args.temperature !== undefined)
         updateData.temperature = args.temperature;
-      if (args.maxContextLength !== undefined)
-        updateData.maxContextLength = args.maxContextLength;
 
       // Update existing settings
       await ctx.db.patch(existingSettings._id, updateData);
@@ -45,7 +42,6 @@ export const saveApiSettings = mutation({
         provider: args.provider || "OpenRouter",
         modelName: args.modelName,
         temperature: args.temperature ?? 0.0,
-        maxContextLength: args.maxContextLength ?? 0,
         createdAt: now,
         updatedAt: now,
       });

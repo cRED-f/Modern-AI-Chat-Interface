@@ -24,6 +24,7 @@ export const sendMessage = mutation({
       v.literal("user"),
       v.literal("ai"),
       v.literal("assistant"),
+      v.literal("mentor"),
       v.literal("system")
     ),
     chatId: v.string(),

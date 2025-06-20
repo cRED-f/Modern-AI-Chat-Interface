@@ -9,6 +9,7 @@ import {
   IconEdit,
   IconRepeat,
   IconBrain,
+  IconCompass,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -38,28 +39,32 @@ export const Message: FC<MessageProps> = ({
     setShowCheckmark(true);
     setTimeout(() => setShowCheckmark(false), 2000);
   };
-
   const isAI = message.role === "ai";
   const isAssistant = message.role === "assistant";
-
+  const isMentor = message.role === "mentor";
   // Extract reminder content and clean content for assistant messages
   const getAssistantData = (content: string) => {
     if (!isAssistant) return { cleanContent: content, reminderContent: null };
 
     const reminderMatch = content.match(
-      /\[ASSISTANT_REMINDER_START\]([\s\S]*?)\[ASSISTANT_REMINDER_END\]/
+      /\[ASSISTANT_GUIDANCE_START\]([\s\S]*?)\[ASSISTANT_GUIDANCE_END\]/
     );
-    const reminderContent = reminderMatch ? reminderMatch[1].trim() : null;
 
-    // Remove assistant reminder tags but keep the actual content
-    const cleanContent = content
-      .replace(
-        /\[ASSISTANT_REMINDER_START\][\s\S]*?\[ASSISTANT_REMINDER_END\]/g,
-        ""
-      )
-      .trim();
+    if (reminderMatch) {
+      // If guidance tags exist, extract the content and remove the tags
+      const reminderContent = reminderMatch[1].trim();
+      const cleanContent = content
+        .replace(
+          /\[ASSISTANT_GUIDANCE_START\][\s\S]*?\[ASSISTANT_GUIDANCE_END\]/g,
+          ""
+        )
+        .trim();
 
-    return { cleanContent, reminderContent };
+      return { cleanContent, reminderContent };
+    } else {
+      // For assistant messages without guidance tags, treat entire content as reminder
+      return { cleanContent: "", reminderContent: content };
+    }
   };
 
   const { cleanContent, reminderContent } = getAssistantData(message.content);
@@ -89,9 +94,11 @@ export const Message: FC<MessageProps> = ({
         "group relative border-b border-white/20 px-4 py-6 transition-colors duration-200",
         isAssistant
           ? "bg-slate-50/60"
-          : isAI
-            ? "bg-emerald-50/60"
-            : "bg-blue-50/40"
+          : isMentor
+            ? "bg-red-50/60"
+            : isAI
+              ? "bg-emerald-50/60"
+              : "bg-blue-50/40"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -104,24 +111,28 @@ export const Message: FC<MessageProps> = ({
               "flex h-8 w-8 items-center justify-center rounded-full border transition-transform duration-200 hover:scale-110",
               isAssistant
                 ? "bg-gradient-to-br from-gray-500 via-slate-500 to-zinc-600 text-white shadow-lg border-gray-300/50"
-                : isAI
-                  ? "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg border-emerald-300/50"
-                  : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white shadow-lg border-blue-300/50"
+                : isMentor
+                  ? "bg-gradient-to-br from-red-500 via-rose-500 to-pink-600 text-white shadow-lg border-red-300/50"
+                  : isAI
+                    ? "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg border-emerald-300/50"
+                    : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white shadow-lg border-blue-300/50"
             )}
           >
+            {" "}
             {isAssistant ? (
               <IconBrain size={18} className="drop-shadow-sm" />
+            ) : isMentor ? (
+              <IconCompass size={18} className="drop-shadow-sm" />
             ) : isAI ? (
               <IconFileTextAi size={18} className="drop-shadow-sm" />
             ) : (
               <IconUser size={18} className="drop-shadow-sm" />
             )}
           </div>
-        </div>
-
+        </div>{" "}
         {/* Content */}
         <div className="flex-1 space-y-2">
-          {/* Assistant Reminder (if present) */}
+          {/* Assistant Reminder - Always shown for assistant messages */}
           {isAssistant && reminderContent && (
             <div className="mb-3 p-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
               <div className="flex items-start space-x-2">
@@ -142,20 +153,40 @@ export const Message: FC<MessageProps> = ({
                   <p className="text-sm font-medium text-amber-800">
                     Assistant Reminder
                   </p>
-                  <p className="text-sm text-amber-700 mt-1">
-                    {reminderContent}
+                  <div className="text-sm text-amber-700 mt-1 prose prose-sm max-w-none">
+                    <ReactMarkdown>{reminderContent}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}{" "}
+          {/* Mentor Reminder - Always shown for mentor messages */}
+          {isMentor && (
+            <div className="mb-3 p-3 bg-red-50 border-l-4 border-red-400 rounded-r-lg">
+              <div className="flex items-start space-x-2">
+                <div className="flex-shrink-0 mt-0.5">
+                  <IconCompass className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-red-800">
+                    Mentor Reminder
                   </p>
+                  <div className="text-sm text-red-700 mt-1 prose prose-sm max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Main Content */}
-          <div className="prose prose-sm max-w-none text-gray-900">
-            <ReactMarkdown>{cleanContent}</ReactMarkdown>
-          </div>
+          {/* Main Content - Only shown if there's clean content (for messages with guidance tags) or if it's not assistant/mentor */}
+          {(cleanContent || (!isAssistant && !isMentor)) && (
+            <div className="prose prose-sm max-w-none text-gray-900">
+              <ReactMarkdown>
+                {!isAssistant && !isMentor ? message.content : cleanContent}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
-
         {/* Action Buttons */}
         <div
           className={cn(

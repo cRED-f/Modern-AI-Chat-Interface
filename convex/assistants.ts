@@ -15,14 +15,12 @@ export const getDefaultAssistant = query({
       .query("assistants")
       .filter((q) => q.eq(q.field("isDefault"), true))
       .first();
-
     if (!defaultAssistant) {
       // Return default values if no default assistant is set
       return {
         name: "Default Assistant",
         modelName: "gpt-4",
         temperature: 0.7,
-        maxContextLength: 4096,
         activeAfterQuestions: 1,
         systemPrompt: undefined,
         isDefault: true,
@@ -38,7 +36,6 @@ export const createAssistant = mutation({
     name: v.string(),
     modelName: v.optional(v.string()),
     temperature: v.optional(v.number()),
-    maxContextLength: v.optional(v.number()),
     activeAfterQuestions: v.optional(v.number()),
     systemPrompt: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),
@@ -71,7 +68,6 @@ export const updateAssistant = mutation({
     name: v.optional(v.string()),
     modelName: v.optional(v.string()),
     temperature: v.optional(v.number()),
-    maxContextLength: v.optional(v.number()),
     activeAfterQuestions: v.optional(v.number()),
     systemPrompt: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),

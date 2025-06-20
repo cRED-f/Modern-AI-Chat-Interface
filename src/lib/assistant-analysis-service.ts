@@ -3,7 +3,6 @@ import { OpenRouterService } from "./openrouter-service";
 export interface AnalysisConfig {
   modelName?: string;
   temperature?: number;
-  maxContextLength?: number;
 }
 
 export interface ConversationMessage {
@@ -52,7 +51,6 @@ export class AssistantAnalysisService {
         modelName,
         {
           temperature,
-          maxTokens: 8192,
         }
       );
       console.log("✅ Assistant analysis completed:", analysis);

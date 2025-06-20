@@ -10,7 +10,11 @@ export const getPrompts = query({
 
 export const getPromptsByTarget = query({
   args: {
-    targetModel: v.union(v.literal("main"), v.literal("assistant")),
+    targetModel: v.union(
+      v.literal("main"),
+      v.literal("assistant"),
+      v.literal("mentor")
+    ),
   },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -25,7 +29,9 @@ export const createPrompt = mutation({
   args: {
     name: v.string(),
     content: v.string(),
-    targetModel: v.optional(v.union(v.literal("main"), v.literal("assistant"))),
+    targetModel: v.optional(
+      v.union(v.literal("main"), v.literal("assistant"), v.literal("mentor"))
+    ),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -45,7 +51,9 @@ export const updatePrompt = mutation({
     id: v.id("prompts"),
     name: v.string(),
     content: v.string(),
-    targetModel: v.optional(v.union(v.literal("main"), v.literal("assistant"))),
+    targetModel: v.optional(
+      v.union(v.literal("main"), v.literal("assistant"), v.literal("mentor"))
+    ),
   },
   handler: async (ctx, args) => {
     const { id, ...updateData } = args;

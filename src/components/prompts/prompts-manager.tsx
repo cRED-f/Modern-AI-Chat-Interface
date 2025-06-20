@@ -22,7 +22,7 @@ interface PromptData {
   _id: Id<"prompts">;
   name: string;
   content: string;
-  targetModel?: "main" | "assistant";
+  targetModel?: "main" | "assistant" | "mentor";
   createdAt: number;
   updatedAt: number;
 }
@@ -54,7 +54,9 @@ const PromptItem: FC<PromptItemProps> = ({ prompt, onEdit, onDelete }) => {
               className={`w-2 h-2 rounded-full shadow-sm ${
                 (prompt.targetModel || "main") === "main"
                   ? "bg-blue-500"
-                  : "bg-purple-500"
+                  : (prompt.targetModel || "main") === "assistant"
+                    ? "bg-purple-500"
+                    : "bg-orange-500"
               }`}
             ></div>
             <h3 className="text-sm font-medium text-gray-800">{prompt.name}</h3>
@@ -62,12 +64,16 @@ const PromptItem: FC<PromptItemProps> = ({ prompt, onEdit, onDelete }) => {
               className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                 (prompt.targetModel || "main") === "main"
                   ? "bg-blue-100 text-blue-700 border border-blue-200"
-                  : "bg-purple-100 text-purple-700 border border-purple-200"
+                  : (prompt.targetModel || "main") === "assistant"
+                    ? "bg-purple-100 text-purple-700 border border-purple-200"
+                    : "bg-orange-100 text-orange-700 border border-orange-200"
               }`}
             >
               {(prompt.targetModel || "main") === "main"
                 ? "Main Model"
-                : "Assistant"}
+                : (prompt.targetModel || "main") === "assistant"
+                  ? "Assistant"
+                  : "Mentor"}
             </span>
           </div>
           <AnimatePresence>
@@ -135,7 +141,7 @@ interface PromptFormProps {
   onSave: (data: {
     name: string;
     content: string;
-    targetModel?: "main" | "assistant";
+    targetModel?: "main" | "assistant" | "mentor";
   }) => void;
   onCancel: () => void;
   isLoading: boolean;
@@ -149,9 +155,9 @@ const PromptForm: FC<PromptFormProps> = ({
 }) => {
   const [name, setName] = useState(prompt?.name || "");
   const [content, setContent] = useState(prompt?.content || "");
-  const [targetModel, setTargetModel] = useState<"main" | "assistant">(
-    prompt?.targetModel || "main"
-  );
+  const [targetModel, setTargetModel] = useState<
+    "main" | "assistant" | "mentor"
+  >(prompt?.targetModel || "main");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,15 +189,15 @@ const PromptForm: FC<PromptFormProps> = ({
             className="bg-white/50 backdrop-blur-sm"
             required
           />
-        </div>
+        </div>{" "}
         {/* Target Model Selection */}
         <div className="space-y-2">
           <Label>Target Model</Label>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-3">
             <motion.button
               type="button"
               onClick={() => setTargetModel("main")}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 text-sm ${
                 targetModel === "main"
                   ? "bg-blue-100 border-blue-300 text-blue-700"
                   : "bg-white/50 border-gray-200 text-gray-600 hover:bg-white/70"
@@ -200,13 +206,13 @@ const PromptForm: FC<PromptFormProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-sm font-medium">Main Model</span>
+              <span className="font-medium">Main</span>
             </motion.button>
 
             <motion.button
               type="button"
               onClick={() => setTargetModel("assistant")}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 text-sm ${
                 targetModel === "assistant"
                   ? "bg-purple-100 border-purple-300 text-purple-700"
                   : "bg-white/50 border-gray-200 text-gray-600 hover:bg-white/70"
@@ -215,7 +221,22 @@ const PromptForm: FC<PromptFormProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-sm font-medium">Assistant</span>
+              <span className="font-medium">Assistant</span>
+            </motion.button>
+
+            <motion.button
+              type="button"
+              onClick={() => setTargetModel("mentor")}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 text-sm ${
+                targetModel === "mentor"
+                  ? "bg-orange-100 border-orange-300 text-orange-700"
+                  : "bg-white/50 border-gray-200 text-gray-600 hover:bg-white/70"
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <span className="font-medium">Mentor</span>
             </motion.button>
           </div>
         </div>
@@ -285,7 +306,7 @@ export const PromptsManager: FC = () => {
     async (data: {
       name: string;
       content: string;
-      targetModel: "main" | "assistant";
+      targetModel?: "main" | "assistant" | "mentor";
     }) => {
       setIsLoading(true);
       try {

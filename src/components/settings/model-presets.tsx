@@ -8,7 +8,6 @@ import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export const ModelPresets: FC = () => {
   const [temperature, setTemperature] = useState(0.7);
-  const [maxContextLength, setMaxContextLength] = useState(4096);
   const [isEditing, setIsEditing] = useState(false);
 
   const apiSettings = useQuery(api.settings.getApiSettings);
@@ -17,7 +16,6 @@ export const ModelPresets: FC = () => {
   useEffect(() => {
     if (apiSettings) {
       setTemperature(apiSettings.temperature ?? 0.7);
-      setMaxContextLength(apiSettings.maxContextLength ?? 4096);
     }
   }, [apiSettings]);
 
@@ -25,13 +23,12 @@ export const ModelPresets: FC = () => {
     try {
       await saveApiSettings({
         temperature: temperature,
-        maxContextLength: maxContextLength,
       });
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save preset settings:", error);
     }
-  }, [temperature, maxContextLength, saveApiSettings]);
+  }, [temperature, saveApiSettings]);
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
@@ -40,7 +37,6 @@ export const ModelPresets: FC = () => {
   const handleCancel = useCallback(() => {
     if (apiSettings) {
       setTemperature(apiSettings.temperature ?? 0.7);
-      setMaxContextLength(apiSettings.maxContextLength ?? 4096);
     }
     setIsEditing(false);
   }, [apiSettings]);
@@ -72,31 +68,6 @@ export const ModelPresets: FC = () => {
           />
           <p className="text-xs text-gray-400">
             Controls randomness (0 = deterministic, 1 = very random)
-          </p>
-        </div>
-        <div className="space-y-3">
-          {" "}
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-600">
-              Max Response Length (Preference)
-            </label>
-            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              {maxContextLength.toLocaleString()}
-            </span>
-          </div>
-          <input
-            type="range"
-            min="1024"
-            max="200000"
-            step="1024"
-            value={maxContextLength}
-            onChange={(e) => setMaxContextLength(parseInt(e.target.value))}
-            disabled={!isEditing}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          />{" "}
-          <p className="text-xs text-gray-400">
-            Maximum tokens for AI responses. This value is passed directly to
-            the AI model.
           </p>
         </div>
       </div>
@@ -134,12 +105,6 @@ export const ModelPresets: FC = () => {
             <span className="text-gray-600">Current Temperature:</span>
             <span className="font-medium text-gray-700">
               {temperature.toFixed(2)}
-            </span>
-          </div>{" "}
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Max Response Length:</span>
-            <span className="font-medium text-gray-700">
-              {maxContextLength.toLocaleString()} tokens
             </span>
           </div>
         </div>

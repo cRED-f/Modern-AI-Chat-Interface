@@ -14,7 +14,6 @@ export interface OpenRouterRequest {
   model: string;
   messages: OpenRouterMessage[];
   temperature?: number;
-  max_tokens?: number;
   stream?: boolean;
 }
 

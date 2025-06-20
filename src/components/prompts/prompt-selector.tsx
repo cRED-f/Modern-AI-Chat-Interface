@@ -91,7 +91,7 @@ export const PromptSelector: FC<PromptSelectorProps> = ({ onPromptSelect }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute bottom-full left-0 mb-2 w-80 max-h-64 overflow-y-auto bg-white/95 backdrop-blur-xl border border-white/30 rounded-lg shadow-xl z-50"
+            className="absolute bottom-full left-0 mb-2 w-80 max-h-64 overflow-y-auto bg-white/95 backdrop-blur-xl border border-white/30 rounded-lg shadow-xl z-[9999]"
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -135,7 +135,7 @@ export const PromptSelector: FC<PromptSelectorProps> = ({ onPromptSelect }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-[9998]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

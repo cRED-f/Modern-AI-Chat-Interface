@@ -8,6 +8,7 @@ export default defineSchema({
       v.literal("user"),
       v.literal("ai"),
       v.literal("assistant"),
+      v.literal("mentor"),
       v.literal("system")
     ),
     timestamp: v.number(),
@@ -24,14 +25,15 @@ export default defineSchema({
     provider: v.string(),
     modelName: v.optional(v.string()),
     temperature: v.optional(v.number()),
-    maxContextLength: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
   prompts: defineTable({
     name: v.string(),
     content: v.string(),
-    targetModel: v.optional(v.union(v.literal("main"), v.literal("assistant"))),
+    targetModel: v.optional(
+      v.union(v.literal("main"), v.literal("assistant"), v.literal("mentor"))
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
@@ -39,7 +41,16 @@ export default defineSchema({
     name: v.string(),
     modelName: v.optional(v.string()),
     temperature: v.optional(v.number()),
-    maxContextLength: v.optional(v.number()),
+    activeAfterQuestions: v.optional(v.number()),
+    systemPrompt: v.optional(v.string()),
+    isDefault: v.optional(v.boolean()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
+  mentors: defineTable({
+    name: v.string(),
+    modelName: v.optional(v.string()),
+    temperature: v.optional(v.number()),
     activeAfterQuestions: v.optional(v.number()),
     systemPrompt: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),

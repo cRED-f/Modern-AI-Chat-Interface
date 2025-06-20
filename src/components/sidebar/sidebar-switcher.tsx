@@ -32,35 +32,30 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
           tooltip="Chats"
         />
-
         <SidebarSwitchItem
           icon={<IconSparkles size={20} />}
           contentType="presets"
           onContentTypeChange={onContentTypeChange}
           tooltip="Presets"
         />
-
         <SidebarSwitchItem
           icon={<IconPencil size={20} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
           tooltip="Prompts"
         />
-
         <SidebarSwitchItem
           icon={<IconRobotFace size={20} />}
           contentType="assistants"
           onContentTypeChange={onContentTypeChange}
           tooltip="Assistants"
-        />
-
+        />{" "}
         <SidebarSwitchItem
           icon={<IconBolt size={20} />}
           contentType="tools"
           onContentTypeChange={onContentTypeChange}
-          tooltip="Tools"
+          tooltip="Mentor"
         />
-
         <SidebarSwitchItem
           icon={<IconSettings size={20} />}
           contentType="settings"

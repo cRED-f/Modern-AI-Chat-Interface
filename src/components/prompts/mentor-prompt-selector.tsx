@@ -4,16 +4,16 @@ import { FC, useState, useRef, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
-import { IconChevronDown, IconSparkles } from "@tabler/icons-react";
+import { IconChevronDown, IconBolt } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface AssistantPromptSelectorProps {
+interface MentorPromptSelectorProps {
   onPromptSelect: (promptContent: string) => void;
   className?: string;
 }
 
-export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
+export const MentorPromptSelector: FC<MentorPromptSelectorProps> = ({
   onPromptSelect,
   className,
 }) => {
@@ -21,9 +21,9 @@ export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
   const [selectedPromptName, setSelectedPromptName] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch only assistant prompts
+  // Fetch only mentor prompts
   const prompts = useQuery(api.prompts.getPromptsByTarget, {
-    targetModel: "assistant",
+    targetModel: "mentor",
   });
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const handlePromptSelect = (prompt: {
     _id: string;
     name: string;
@@ -65,15 +66,15 @@ export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "h-9 px-3 text-sm font-medium transition-all duration-200",
-          "border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100",
+          "border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100",
           "flex items-center gap-2 min-w-[140px] justify-between",
-          selectedPromptName && "bg-purple-100 border-purple-300"
+          selectedPromptName && "bg-orange-100 border-orange-300"
         )}
       >
         {" "}
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <IconSparkles size={16} className="text-purple-600 flex-shrink-0" />
-          <span className="truncate">{selectedPromptName || "Assistant"}</span>
+          <IconBolt size={16} className="text-orange-600 flex-shrink-0" />
+          <span className="truncate">{selectedPromptName || "Mentor"}</span>
         </div>
         <IconChevronDown
           size={16}
@@ -91,13 +92,13 @@ export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-full mb-1 right-0 w-80 bg-white border border-purple-200 rounded-lg shadow-lg z-[9999] max-h-60 overflow-hidden"
+            className="absolute bottom-full mb-1 right-0 w-80 bg-white border border-orange-200 rounded-lg shadow-lg z-[9999] max-h-60 overflow-hidden"
           >
             <div className="flex items-center justify-between">
               {selectedPromptName && (
                 <button
                   onClick={handleClear}
-                  className="text-xs text-purple-600 hover:text-purple-800 transition-colors"
+                  className="text-xs text-orange-600 hover:text-orange-800 transition-colors"
                 >
                   Clear
                 </button>
@@ -111,17 +112,17 @@ export const AssistantPromptSelector: FC<AssistantPromptSelectorProps> = ({
                     key={prompt._id}
                     onClick={() => handlePromptSelect(prompt)}
                     className={cn(
-                      "w-full text-left p-3 hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-b-0",
+                      "w-full text-left p-3 hover:bg-orange-50 transition-colors border-b border-gray-100 last:border-b-0",
                       selectedPromptName === prompt.name &&
-                        "bg-purple-100 border-purple-200"
+                        "bg-orange-100 border-orange-200"
                     )}
-                    whileHover={{ backgroundColor: "rgb(245 243 255)" }}
+                    whileHover={{ backgroundColor: "rgb(255 247 237)" }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="font-medium text-sm text-purple-700 mb-1">
+                    <div className="font-medium text-sm text-orange-700 mb-1">
                       {prompt.name}
                     </div>
-                    <div className="text-xs text-purple-600 line-clamp-2">
+                    <div className="text-xs text-orange-600 line-clamp-2">
                       {prompt.content.length > 100
                         ? `${prompt.content.substring(0, 100)}...`
                         : prompt.content}

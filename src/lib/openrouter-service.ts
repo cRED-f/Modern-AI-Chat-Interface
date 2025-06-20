@@ -18,7 +18,6 @@ export class OpenRouterService {
     model: string,
     options: {
       temperature?: number;
-      maxTokens?: number;
       stream?: boolean;
     } = {}
   ): Promise<string> {
@@ -34,13 +33,12 @@ export class OpenRouterService {
         `⚠️  Model name "${model}" doesn't follow provider/model format. This might cause issues.`
       );
     }
-    const { temperature = 0.0, maxTokens = 0, stream = false } = options;
+    const { temperature = 0.0, stream = false } = options;
 
     const request: OpenRouterRequest = {
       model,
       messages,
       temperature,
-      max_tokens: maxTokens,
       stream,
     };
 
@@ -48,24 +46,8 @@ export class OpenRouterService {
       model,
       messageCount: messages.length,
       temperature,
-      maxTokens,
       stream,
     });
-
-    // Log first and last message for debugging
-    if (messages.length > 0) {
-      console.log("📝 First message:", {
-        role: messages[0].role,
-        contentLength: messages[0].content.length,
-      });
-      if (messages.length > 1) {
-        const lastMsg = messages[messages.length - 1];
-        console.log("📝 Last message:", {
-          role: lastMsg.role,
-          contentLength: lastMsg.content.length,
-        });
-      }
-    }
 
     try {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
@@ -88,7 +70,6 @@ export class OpenRouterService {
           model,
           messageCount: messages.length,
           temperature,
-          maxTokens,
         });
 
         // Handle different error response formats
@@ -150,7 +131,6 @@ export class OpenRouterService {
     onChunk: (chunk: string) => void,
     options: {
       temperature?: number;
-      maxTokens?: number;
     } = {}
   ): Promise<void> {
     if (!model || model.trim() === "") {
@@ -158,13 +138,11 @@ export class OpenRouterService {
         "No model specified. Please configure a model in settings."
       );
     }
-    const { temperature = 0.0, maxTokens = 0 } = options;
-
+    const { temperature = 0.0 } = options;
     const request: OpenRouterRequest = {
       model,
       messages,
       temperature,
-      max_tokens: maxTokens,
       stream: true,
     };
 
@@ -175,7 +153,7 @@ export class OpenRouterService {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": window.location.origin,
-          "X-Title": "ChatBot UI Clone",
+          "X-Title": "Chat UI",
         },
         body: JSON.stringify(request),
       });

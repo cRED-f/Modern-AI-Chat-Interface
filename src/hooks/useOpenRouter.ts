@@ -11,14 +11,12 @@ export const useOpenRouter = (apiKey?: string) => {
   const service = useMemo(() => {
     return apiKey ? new OpenRouterService(apiKey) : null;
   }, [apiKey]);
-
   const sendMessage = useCallback(
     async (
       messages: OpenRouterMessage[],
       options: {
         model: string;
         temperature?: number;
-        maxTokens?: number;
       }
     ): Promise<string | null> => {
       if (!service) {
@@ -37,7 +35,6 @@ export const useOpenRouter = (apiKey?: string) => {
       try {
         const response = await service.sendMessage(messages, options.model, {
           temperature: options?.temperature,
-          maxTokens: options?.maxTokens,
         });
         return response;
       } catch (err) {
@@ -51,7 +48,6 @@ export const useOpenRouter = (apiKey?: string) => {
     },
     [service]
   );
-
   const sendMessageStream = useCallback(
     async (
       messages: OpenRouterMessage[],
@@ -59,7 +55,6 @@ export const useOpenRouter = (apiKey?: string) => {
       options: {
         model: string;
         temperature?: number;
-        maxTokens?: number;
       }
     ): Promise<void> => {
       if (!service) {
@@ -74,11 +69,9 @@ export const useOpenRouter = (apiKey?: string) => {
 
       setIsGenerating(true);
       setError(null);
-
       try {
         await service.sendMessageStream(messages, options.model, onChunk, {
           temperature: options?.temperature,
-          maxTokens: options?.maxTokens,
         });
       } catch (err) {
         const errorMessage =
