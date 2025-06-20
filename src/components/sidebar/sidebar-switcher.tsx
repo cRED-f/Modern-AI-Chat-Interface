@@ -8,6 +8,8 @@ import {
   IconPencil,
   IconSparkles,
   IconSettings,
+  IconCalculator,
+  IconAdjustments,
 } from "@tabler/icons-react";
 import { FC } from "react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -55,6 +57,18 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           contentType="tools"
           onContentTypeChange={onContentTypeChange}
           tooltip="Mentor"
+        />
+        <SidebarSwitchItem
+          icon={<IconCalculator size={20} />}
+          contentType="calculate-score"
+          onContentTypeChange={onContentTypeChange}
+          tooltip="Calculate Score"
+        />
+        <SidebarSwitchItem
+          icon={<IconAdjustments size={20} />}
+          contentType="calculation-settings"
+          onContentTypeChange={onContentTypeChange}
+          tooltip="Calculation Settings"
         />
         <SidebarSwitchItem
           icon={<IconSettings size={20} />}

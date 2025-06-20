@@ -5,7 +5,9 @@ export type ContentType =
   | "assistants"
   | "tools"
   | "settings"
-  | "models";
+  | "models"
+  | "calculate-score"
+  | "calculation-settings";
 
 export interface ChatMessage {
   _id: string;

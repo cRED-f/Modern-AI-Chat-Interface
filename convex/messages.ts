@@ -125,3 +125,24 @@ export const getMessagesForUI = query({
       }));
   },
 });
+
+// Get conversation history for analysis (excluding assistant and mentor messages)
+export const getConversationHistory = query({
+  args: { chatId: v.string() },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
+      .order("asc")
+      .collect();
+
+    // Filter out assistant and mentor messages, only keep user and ai messages
+    const conversationMessages = messages.filter(
+      (msg) => msg.role === "user" || msg.role === "ai"
+    );
+
+    return conversationMessages.map((msg) => ({
+      ...msg,
+    }));
+  },
+});

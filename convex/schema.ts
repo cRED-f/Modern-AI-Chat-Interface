@@ -32,7 +32,12 @@ export default defineSchema({
     name: v.string(),
     content: v.string(),
     targetModel: v.optional(
-      v.union(v.literal("main"), v.literal("assistant"), v.literal("mentor"))
+      v.union(
+        v.literal("main"),
+        v.literal("assistant"),
+        v.literal("mentor"),
+        v.literal("calculate-main-model")
+      )
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -57,4 +62,20 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
+  calculationSettings: defineTable({
+    modelName: v.string(),
+    temperature: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
+  chatAnalyses: defineTable({
+    chatId: v.string(),
+    promptId: v.string(),
+    promptName: v.string(),
+    promptContent: v.string(),
+    modelName: v.string(),
+    temperature: v.number(),
+    result: v.string(),
+    createdAt: v.number(),
+  }).index("by_chat", ["chatId"]),
 });

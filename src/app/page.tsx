@@ -10,13 +10,32 @@ import { Button } from "@/components/ui/button";
 import { IconChevronRight } from "@tabler/icons-react";
 import { WithTooltip } from "@/components/ui/with-tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+import { ContentType } from "@/types";
+import { CalculationInterface } from "@/components/calculation/calculation-interface";
 
 function HomeContent() {
   const { currentChatId, setCurrentChatId } = useChatContext();
   const createChat = useMutation(api.messages.createChat);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [currentContentType, setCurrentContentType] =
+    useState<ContentType>("chats");
+  const [selectedCalculationChatId, setSelectedCalculationChatId] = useState<
+    string | null
+  >(null);
 
   const chats = useQuery(api.messages.getChats);
+
+  const renderMainContent = () => {
+    switch (currentContentType) {
+      case "calculate-score":
+      case "calculation-settings":
+        return (
+          <CalculationInterface selectedChatId={selectedCalculationChatId} />
+        );
+      default:
+        return <ChatUI chatId={currentChatId} />;
+    }
+  };
 
   const handleNewChat = useCallback(async () => {
     const chatId = await createChat({ title: "New Chat" });
@@ -105,10 +124,12 @@ function HomeContent() {
       >
         <div className="backdrop-blur-xl bg-white/80 border-r border-white/20 h-full">
           <Sidebar
-            contentType="chats"
+            contentType={currentContentType}
             showSidebar={sidebarVisible}
             onCreateChat={handleNewChat}
             onToggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+            onContentTypeChange={setCurrentContentType}
+            onSelectCalculationChat={setSelectedCalculationChatId}
           />
         </div>
       </motion.div>
@@ -158,7 +179,7 @@ function HomeContent() {
         transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
       >
         <div className="backdrop-blur-sm bg-white/70 h-full">
-          <ChatUI chatId={currentChatId} />
+          {renderMainContent()}
         </div>
       </motion.div>
     </motion.div>

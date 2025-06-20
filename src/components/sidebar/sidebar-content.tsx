@@ -13,18 +13,22 @@ import { ModelPresets } from "../settings/model-presets";
 import { PromptsManager } from "../prompts/prompts-manager";
 import { AssistantsManager } from "../assistants/assistants-manager";
 import { MentorsManager } from "../mentors/mentors-manager";
+import CalculationSettings from "../calculation/calculation-settings";
+import CalculateScore from "../calculation/calculate-score";
 import { motion } from "framer-motion";
 
 interface SidebarContentProps {
   contentType: ContentType;
   onCreateChat?: () => void;
   onToggleSidebar?: () => void;
+  onSelectCalculationChat?: (chatId: string) => void;
 }
 
 export const SidebarContent: FC<SidebarContentProps> = ({
   contentType,
   onCreateChat,
   onToggleSidebar,
+  onSelectCalculationChat,
 }) => {
   const chats = useQuery(api.messages.getChats) || [];
   const renderSidebarContent = (
@@ -234,8 +238,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({
               </motion.div>
             )}
           </motion.div>
-
-          {/* Mentor Content */}
+          {/* Mentor Content */}{" "}
           <motion.div
             className="flex-1 overflow-y-auto"
             initial={{ opacity: 0 }}
@@ -245,6 +248,23 @@ export const SidebarContent: FC<SidebarContentProps> = ({
             <MentorsManager />
           </motion.div>
         </motion.div>
+      );
+    } // Special handling for calculation settings
+    if (contentType === "calculation-settings") {
+      return (
+        <div className="h-full">
+          <CalculationSettings onToggleSidebar={onToggleSidebar} />
+        </div>
+      );
+    } // Special handling for calculate score
+    if (contentType === "calculate-score") {
+      return (
+        <div className="h-full">
+          <CalculateScore
+            onToggleSidebar={onToggleSidebar}
+            onSelectCalculationChat={onSelectCalculationChat}
+          />
+        </div>
       );
     }
 
@@ -333,6 +353,10 @@ export const SidebarContent: FC<SidebarContentProps> = ({
       return renderSidebarContent("tools", [], []);
     case "settings":
       return renderSidebarContent("settings", [], []);
+    case "calculation-settings":
+      return renderSidebarContent("calculation-settings", [], []);
+    case "calculate-score":
+      return renderSidebarContent("calculate-score", [], []);
     default:
       return null;
   }

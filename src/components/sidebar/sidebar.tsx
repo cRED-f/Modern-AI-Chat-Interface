@@ -12,6 +12,8 @@ interface SidebarProps {
   showSidebar: boolean;
   onCreateChat?: () => void;
   onToggleSidebar?: () => void;
+  onContentTypeChange?: (contentType: ContentType) => void;
+  onSelectCalculationChat?: (chatId: string) => void;
 }
 
 export const Sidebar: FC<SidebarProps> = ({
@@ -19,12 +21,15 @@ export const Sidebar: FC<SidebarProps> = ({
   showSidebar,
   onCreateChat,
   onToggleSidebar,
+  onContentTypeChange,
+  onSelectCalculationChat,
 }) => {
   const [currentContentType, setCurrentContentType] =
     useState<ContentType>(contentType);
 
   const handleContentTypeChange = (newContentType: ContentType) => {
     setCurrentContentType(newContentType);
+    onContentTypeChange?.(newContentType);
   }; // Always show the sidebar container - only hide the content area
   return (
     <div className="flex h-full">
@@ -65,38 +70,49 @@ export const Sidebar: FC<SidebarProps> = ({
                     onToggleSidebar={onToggleSidebar}
                   />
                 </TabsContent>
-
                 <TabsContent value="presets" className="h-full p-0">
                   <SidebarContent
                     contentType="presets"
                     onToggleSidebar={onToggleSidebar}
                   />
                 </TabsContent>
-
                 <TabsContent value="prompts" className="h-full p-0">
                   <SidebarContent
                     contentType="prompts"
                     onToggleSidebar={onToggleSidebar}
                   />
                 </TabsContent>
-
                 <TabsContent value="assistants" className="h-full p-0">
                   <SidebarContent
                     contentType="assistants"
                     onToggleSidebar={onToggleSidebar}
                   />
                 </TabsContent>
-
                 <TabsContent value="tools" className="h-full p-0">
                   <SidebarContent
                     contentType="tools"
                     onToggleSidebar={onToggleSidebar}
                   />
-                </TabsContent>
-
+                </TabsContent>{" "}
                 <TabsContent value="settings" className="h-full p-0">
                   <SidebarContent
                     contentType="settings"
+                    onToggleSidebar={onToggleSidebar}
+                  />
+                </TabsContent>{" "}
+                <TabsContent value="calculate-score" className="h-full p-0">
+                  <SidebarContent
+                    contentType="calculate-score"
+                    onToggleSidebar={onToggleSidebar}
+                    onSelectCalculationChat={onSelectCalculationChat}
+                  />
+                </TabsContent>
+                <TabsContent
+                  value="calculation-settings"
+                  className="h-full p-0"
+                >
+                  <SidebarContent
+                    contentType="calculation-settings"
                     onToggleSidebar={onToggleSidebar}
                   />
                 </TabsContent>
