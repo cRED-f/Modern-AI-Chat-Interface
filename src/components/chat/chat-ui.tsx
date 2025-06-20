@@ -43,10 +43,10 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
     isGenerating: isOpenRouterGenerating,
     error: openRouterError,
   } = useOpenRouter(apiKey);
-
   const { analyzeConversation, isAnalyzing: isAssistantAnalyzing } =
     useAssistantAnalysis(apiKey);
-  const { analyzeMentorInput } = useMentorAnalysis(apiKey);
+  const { analyzeMentorInput, isAnalyzing: isMentorAnalyzing } =
+    useMentorAnalysis(apiKey);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []); // Calculate if this is the first message (no user/ai messages exist yet, excluding assistant messages)
@@ -112,7 +112,7 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
 
           // Check if we should trigger analysis based on configuration
           const shouldTrigger =
-            totalExchanges >= 3 && // First activation after 3 exchanges
+            totalExchanges >= 7 && // First activation after 3 exchanges
             totalExchanges % (assistantConfig.activeAfterQuestions || 3) === 0; // Then based on setting
 
           console.log("🤖 Assistant Analysis Check:", {
@@ -489,7 +489,8 @@ Please incorporate this guidance into your response while maintaining your natur
             </motion.div>
           )}{" "}
           <AnimatePresence mode="wait">
-            {" "}            <ChatMessages
+            {" "}
+            <ChatMessages
               messages={(messages || [])
                 .filter((msg) => msg.role !== "system") // Hide system messages from UI, but show assistant and mentor
                 .map((msg) => ({
@@ -520,6 +521,7 @@ Please incorporate this guidance into your response while maintaining your natur
           onSendMessage={handleSendMessage}
           isGenerating={isOpenRouterGenerating}
           isAssistantAnalyzing={isAssistantAnalyzing}
+          isMentorAnalyzing={isMentorAnalyzing}
           isFirstMessage={isFirstMessage}
           onStopGeneration={handleStopGeneration}
         />

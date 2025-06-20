@@ -177,9 +177,9 @@ export const Message: FC<MessageProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          )}{" "}
           {/* Main Content - Only shown if there's clean content (for messages with guidance tags) or if it's not assistant/mentor */}
-          {(cleanContent || (!isAssistant && !isMentor)) && (
+          {((cleanContent && !isMentor) || (!isAssistant && !isMentor)) && (
             <div className="prose prose-sm max-w-none text-gray-900">
               <ReactMarkdown>
                 {!isAssistant && !isMentor ? message.content : cleanContent}

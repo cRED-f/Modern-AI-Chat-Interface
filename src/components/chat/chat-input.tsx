@@ -18,6 +18,7 @@ interface ChatInputProps {
   ) => void;
   isGenerating?: boolean;
   isAssistantAnalyzing?: boolean;
+  isMentorAnalyzing?: boolean;
   onStopGeneration?: () => void;
   isFirstMessage?: boolean;
 }
@@ -26,6 +27,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   onSendMessage,
   isGenerating = false,
   isAssistantAnalyzing = false,
+  isMentorAnalyzing = false,
   onStopGeneration,
   isFirstMessage = true,
 }) => {
@@ -129,6 +131,27 @@ export const ChatInput: FC<ChatInputProps> = ({
             </div>
             <div className="text-sm font-medium text-purple-700">
               Assistant is analyzing the conversation...
+            </div>
+          </div>{" "}
+        </div>
+      )}
+      {/* Mentor Analyzing Indicator */}
+      {isMentorAnalyzing && (
+        <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-lg p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <div
+                className="w-2 h-2 bg-red-400 rounded-full animate-pulse"
+                style={{ animationDelay: "0.2s" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-red-300 rounded-full animate-pulse"
+                style={{ animationDelay: "0.4s" }}
+              ></div>
+            </div>
+            <div className="text-sm font-medium text-red-700">
+              Mentor is analyzing your input...
             </div>
           </div>{" "}
         </div>
