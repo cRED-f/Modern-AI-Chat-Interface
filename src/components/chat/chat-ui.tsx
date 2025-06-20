@@ -108,12 +108,13 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
           const userAiMessages = (messages || []).filter(
             (msg) => msg.role === "user" || msg.role === "ai"
           );
-          const totalExchanges = Math.floor((userAiMessages.length + 1) / 2); // +1 for current user message
-
-          // Check if we should trigger analysis based on configuration
+          const totalExchanges = Math.floor((userAiMessages.length + 1) / 2); // +1 for current user message          // Check if we should trigger analysis based on configuration
           const shouldTrigger =
-            totalExchanges >= 7 && // First activation after 3 exchanges
-            totalExchanges % (assistantConfig.activeAfterQuestions || 3) === 0; // Then based on setting
+            totalExchanges === 7 || // First activation after 7 exchanges
+            (totalExchanges > 7 &&
+              (totalExchanges - 7) %
+                (assistantConfig.activeAfterQuestions || 3) ===
+                0); // Then every N exchanges based on setting
 
           console.log("🤖 Assistant Analysis Check:", {
             totalExchanges,
@@ -167,12 +168,13 @@ export const ChatUI: FC<ChatUIProps> = ({ chatId }) => {
           const userAiMessages = (messages || []).filter(
             (msg) => msg.role === "user" || msg.role === "ai"
           );
-          const totalExchanges = Math.floor((userAiMessages.length + 1) / 2); // +1 for current user message
-
-          // Mentor activates initially after 6 exchanges, then based on activeAfterQuestions
+          const totalExchanges = Math.floor((userAiMessages.length + 1) / 2); // +1 for current user message          // Mentor activates initially after 6 exchanges, then based on activeAfterQuestions
           const shouldTrigger =
-            totalExchanges >= 6 && // First activation after 6 exchanges
-            totalExchanges % (mentorConfig.activeAfterQuestions || 3) === 0; // Then based on setting
+            totalExchanges === 6 || // First activation after 6 exchanges
+            (totalExchanges > 6 &&
+              (totalExchanges - 6) %
+                (mentorConfig.activeAfterQuestions || 3) ===
+                0); // Then every N exchanges based on setting
 
           console.log("🧭 Mentor Analysis Check:", {
             totalExchanges,
